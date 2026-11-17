@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="am">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102b46">
+  <meta name="description" content="Ethiopia Jobs — በኢትዮጵያ የሚወጡ የሥራ ማስታወቂያዎችን በአንድ ቦታ ያግኙ።">
+  <title>Ethiopia Jobs | የሥራ ማስታወቂያዎች</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Ethiopic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script src="/assets/js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Ethiopia Jobs home">
+      <span class="brand-mark">EJ</span>
+      <span>Ethiopia <strong>Jobs</strong></span>
+    </a>
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <a href="#latest" data-i18n="navLatest">አዳዲስ ሥራዎች</a>
+      <a href="#sources" data-i18n="navSources">ምንጮች</a>
+      <a href="#about" data-i18n="navAbout">ስለ እኛ</a>
+    </nav>
+    <div class="header-actions">
+      <button class="language-toggle" id="language-toggle" type="button" aria-label="Change language">EN</button>
+      <a class="admin-link" href="/admin" aria-label="Admin sign in">Admin</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <span class="eyebrow" data-i18n="eyebrow">የኢትዮጵያ የሥራ ዕድሎች ማዕከል</span>
+        <h1 data-i18n="heroTitle">ትክክለኛውን የሥራ ዕድል<br>በቀላሉ ያግኙ</h1>
+        <p data-i18n="heroText">ከጋዜጦችና ከታመኑ ምንጮች የወጡ የሥራ ማስታወቂያዎችን በአንድ ቦታ ይፈልጉ።</p>
+        <form class="search-panel" id="search-form">
+          <label class="search-field">
+            <span data-i18n="searchLabel">የሥራ ስም ወይም ድርጅት</span>
+            <input id="job-search" type="search" placeholder="ለምሳሌ፦ Accountant" data-i18n-placeholder="searchPlaceholder">
+          </label>
+          <label class="search-field location-field">
+            <span data-i18n="locationLabel">ከተማ / ክልል</span>
+            <input id="location-search" type="text" placeholder="Addis Ababa" data-i18n-placeholder="locationPlaceholder">
+          </label>
+          <button class="search-button" type="submit" data-i18n="searchButton">ፈልግ</button>
+        </form>
+        <div class="hero-note"><span class="status-dot"></span><span data-i18n="heroNote">የማስታወቂያዎች ምንጭ በግልጽ ይጠቀሳል</span></div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="art-card art-card-main"><span class="art-icon">↗</span><div class="art-line wide"></div><div class="art-line"></div><div class="art-line short"></div><div class="art-pill"></div></div>
+        <div class="art-card art-card-small"><span class="art-check">✓</span><div class="art-line"></div><div class="art-line short"></div></div>
+        <div class="art-orbit"></div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="Website highlights">
+      <div><strong>01</strong><span data-i18n="statOne">የተለያዩ የሥራ ምንጮች</span></div>
+      <div><strong>02</strong><span data-i18n="statTwo">በአማርኛና በእንግሊዝኛ</span></div>
+      <div><strong>03</strong><span data-i18n="statThree">የመጀመሪያ ማመልከቻ መመሪያ</span></div>
+    </section>
+
+    <section class="content-section" id="latest">
+      <div class="section-heading">
+        <div><span class="eyebrow" data-i18n="latestEyebrow">አሁን ይመልከቱ</span><h2 data-i18n="latestTitle">የቅርብ ጊዜ ማስታወቂያዎች</h2></div>
+        <span class="coming-soon" data-i18n="phaseLabel">Phase 1 · መሠረታዊ ዝግጅት</span>
+      </div>
+      <div class="jobs-status" id="jobs-status" role="status" aria-live="polite"></div>
+      <div class="jobs-grid" id="jobs-list"></div>
+      <div class="pagination" id="jobs-pagination" hidden><button type="button" id="jobs-prev">ቀዳሚ</button><span id="jobs-page-label"></span><button type="button" id="jobs-next">ቀጣይ</button></div>
+    </section>
+
+    <section class="source-band" id="sources">
+      <div><span class="eyebrow" data-i18n="sourceEyebrow">ታማኝ ምንጮች</span><h2 data-i18n="sourceTitle">ምንጩን እናሳያለን።</h2><p data-i18n="sourceText">የሥራ ማስታወቂያው የታተመበትን ጋዜጣ፣ ቀንና የመጀመሪያ የማመልከቻ መንገድ በግልጽ እናቀርባለን።</p></div>
+        <div class="source-seal">SOURCE<br><strong>FIRST</strong></div>
+      </div>
+    </section>
+
+    <section class="about-section" id="about">
+      <h2 data-i18n="aboutTitle">ቀላል፣ ግልጽ፣ የታመነ</h2>
+      <p data-i18n="aboutText">Ethiopia Jobs የሥራ ማስታወቂያዎችን ያሰባስባል፤ ማመልከቻውን ግን በዋናው ማስታወቂያ ላይ በተገለጸው መንገድ ያከናውኑ።</p>
+    </section>
+  </main>
+
+  <footer class="site-footer"><a class="brand footer-brand" href="/"><span class="brand-mark">EJ</span><span>Ethiopia <strong>Jobs</strong></span></a><p>© <span id="year"></span> Ethiopia Jobs. <span data-i18n="footerText">መብቱ የተጠበቀ ነው።</span></p></footer>
+</body>
+</html>

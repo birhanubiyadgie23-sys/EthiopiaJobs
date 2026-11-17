@@ -66,11 +66,9 @@
         <div><span class="eyebrow" data-i18n="latestEyebrow">አሁን ይመልከቱ</span><h2 data-i18n="latestTitle">የቅርብ ጊዜ ማስታወቂያዎች</h2></div>
         <span class="coming-soon" data-i18n="phaseLabel">Phase 1 · መሠረታዊ ዝግጅት</span>
       </div>
-      <div class="empty-state">
-        <div class="empty-icon">⌕</div>
-        <h3 data-i18n="emptyTitle">የሥራ ማስታወቂያዎች በቅርቡ ይጨመራሉ</h3>
-        <p data-i18n="emptyText">የመጀመሪያው የመሠረት ደረጃ እየተዘጋጀ ነው። የተረጋገጡ ማስታወቂያዎች ከተጨመሩ በኋላ እዚህ ይታያሉ።</p>
-      </div>
+      <div class="jobs-status" id="jobs-status" role="status" aria-live="polite"></div>
+      <div class="jobs-grid" id="jobs-list"></div>
+      <div class="pagination" id="jobs-pagination" hidden><button type="button" id="jobs-prev">ቀዳሚ</button><span id="jobs-page-label"></span><button type="button" id="jobs-next">ቀጣይ</button></div>
     </section>
 
     <section class="source-band" id="sources">

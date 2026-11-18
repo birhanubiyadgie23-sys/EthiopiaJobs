@@ -1,0 +1,508 @@
+
+<!DOCTYPE html>
+<html lang="am">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin Dashboard | Ethiopia Jobs</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    header {
+      background: #123b66;
+      color: white;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    header h1 {
+      font-size: 21px;
+      margin: 0;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    #adminEmail {
+      font-size: 13px;
+      color: #dbeafe;
+    }
+
+    button, .nav-link {
+      cursor: pointer;
+      border: 0;
+      border-radius: 7px;
+      padding: 10px 15px;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    #logoutButton {
+      background: #dc2626;
+      color: white;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .welcome {
+      margin-bottom: 25px;
+    }
+
+    .welcome h2 {
+      margin: 0 0 7px;
+      color: #123b66;
+    }
+
+    .welcome p {
+      margin: 0;
+      color: #64748b;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 23px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    }
+
+    .stat-card p {
+      margin: 0 0 12px;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .stat-card strong {
+      font-size: 30px;
+      color: #123b66;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      margin-bottom: 25px;
+    }
+
+    .panel h3 {
+      margin: 0 0 18px;
+      color: #123b66;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 650px;
+    }
+
+    th, td {
+      padding: 13px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #475569;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+    }
+
+    .status.published {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status.draft {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .empty, .error {
+      padding: 20px;
+      text-align: center;
+      color: #64748b;
+    }
+
+    .error {
+      color: #dc2626;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .nav-link {
+      display: inline-block;
+      background: #123b66;
+      color: white;
+    }
+
+    #refreshButton {
+      background: #e2e8f0;
+      color: #123b66;
+    }
+
+    #pageMessage {
+      margin: 15px 0;
+      color: #dc2626;
+      font-size: 14px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 16px;
+      }
+
+      main {
+        margin-top: 22px;
+        padding: 0 12px;
+      }
+
+      .panel {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Ethiopia Jobs — Admin</h1>
+
+  <div class="header-right">
+    <span id="adminEmail">በመፈተሽ ላይ...</span>
+    <button id="logoutButton" type="button">Logout</button>
+  </div>
+</header>
+
+<main>
+
+  <section class="welcome">
+    <h2>እንኳን ወደ Admin Dashboard በደህና መጡ!</h2>
+    <p>የEthiopia Jobs ድረገጽ አስተዳደር ማዕከል</p>
+  </section>
+
+  <div id="pageMessage" role="status"></div>
+
+  <section class="stats">
+    <div class="stat-card">
+      <p>ጠቅላላ የስራ ማስታወቂያዎች</p>
+      <strong id="totalJobs">—</strong>
+    </div>
+
+    <div class="stat-card">
+      <p>የታተሙ ስራዎች</p>
+      <strong id="publishedJobs">—</strong>
+    </div>
+
+    <div class="stat-card">
+      <p>የስራ ዘርፎች</p>
+      <strong id="totalCategories">—</strong>
+    </div>
+
+    <div class="stat-card">
+      <p>አካባቢዎች</p>
+      <strong id="totalLocations">—</strong>
+    </div>
+
+    <div class="stat-card">
+      <p>ንቁ የዜና ምንጮች</p>
+      <strong id="activeNewspapers">—</strong>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3>የቅርብ ጊዜ የስራ ማስታወቂያዎች</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>የስራ ርዕስ</th>
+            <th>ድርጅት</th>
+            <th>ሁኔታ</th>
+            <th>የታተመበት ቀን</th>
+          </tr>
+        </thead>
+
+        <tbody id="jobsTable">
+          <tr>
+            <td colspan="4" class="empty">
+              መረጃ በማምጣት ላይ...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3>ፈጣን መዳረሻዎች</h3>
+
+    <div class="actions">
+      <a class="nav-link" href="/">ዋናውን ድረገጽ ክፈት</a>
+
+      <button id="refreshButton" type="button">
+        መረጃዎችን አድስ
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Ethiopia Jobs Admin Dashboard
+</footer>
+
+<script>
+"use strict";
+
+const $ = (id) => document.getElementById(id);
+
+async function requestJSON(url, options = {}) {
+  const response = await fetch(url, {
+    credentials: "same-origin",
+    cache: "no-store",
+    ...options
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || "Request failed");
+  }
+
+  return result;
+}
+
+function showMessage(message) {
+  $("pageMessage").textContent = message;
+}
+
+function setStat(id, value) {
+  $(id).textContent = String(value);
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return date.toLocaleDateString("am-ET");
+}
+
+function statusLabel(status) {
+  const labels = {
+    published: "የታተመ",
+    draft: "ረቂቅ",
+    pending_review: "በግምገማ ላይ",
+    expired: "ጊዜው ያለፈ",
+    rejected: "ውድቅ የተደረገ"
+  };
+
+  return labels[status] || status || "—";
+}
+
+function renderJobs(jobs) {
+  const tbody = $("jobsTable");
+  tbody.replaceChildren();
+
+  if (!Array.isArray(jobs) || jobs.length === 0) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+
+    cell.colSpan = 4;
+    cell.className = "empty";
+    cell.textContent = "እስካሁን የስራ ማስታወቂያ የለም።";
+
+    row.appendChild(cell);
+    tbody.appendChild(row);
+    return;
+  }
+
+  jobs.forEach((job) => {
+    const row = document.createElement("tr");
+
+    const title = document.createElement("td");
+    title.textContent = job.title_am || job.title_en || "—";
+
+    const organization = document.createElement("td");
+    organization.textContent = job.organization_name || "—";
+
+    const statusCell = document.createElement("td");
+    const status = document.createElement("span");
+
+    status.className =
+      "status " + (job.status === "published" ? "published" :
+      job.status === "draft" ? "draft" : "");
+
+    status.textContent = statusLabel(job.status);
+    statusCell.appendChild(status);
+
+    const date = document.createElement("td");
+    date.textContent = formatDate(job.published_at);
+
+    row.append(title, organization, statusCell, date);
+    tbody.appendChild(row);
+  });
+}
+
+async function checkSession() {
+  try {
+    const result = await requestJSON("/api/admin/me");
+
+    if (!result.authenticated || !result.admin) {
+      window.location.replace("/admin.html");
+      return false;
+    }
+
+    $("adminEmail").textContent = result.admin.email;
+    return true;
+
+  } catch (error) {
+    window.location.replace("/admin.html");
+    return false;
+  }
+}
+
+async function loadDashboard() {
+  showMessage("");
+
+  try {
+    const [jobsResult, categoriesResult, locationsResult,
+      newspapersResult] = await Promise.all([
+        requestJSON("/api/jobs?page=1&limit=10"),
+        requestJSON("/api/categories"),
+        requestJSON("/api/locations"),
+        requestJSON("/api/newspapers")
+      ]);
+
+    const jobs = Array.isArray(jobsResult.data)
+      ? jobsResult.data : [];
+
+    const categories = Array.isArray(categoriesResult.data)
+      ? categoriesResult.data : [];
+
+    const locations = Array.isArray(locationsResult.data)
+      ? locationsResult.data : [];
+
+    const newspapers = Array.isArray(newspapersResult.data)
+      ? newspapersResult.data : [];
+
+    const totalJobs = jobsResult.pagination &&
+      Number.isFinite(Number(jobsResult.pagination.total))
+        ? Number(jobsResult.pagination.total)
+        : jobs.length;
+
+    setStat("totalJobs", totalJobs);
+
+    setStat(
+      "publishedJobs",
+      jobs.filter((job) => job.status === "published").length
+    );
+
+    setStat("totalCategories", categories.length);
+    setStat("totalLocations", locations.length);
+
+    setStat(
+      "activeNewspapers",
+      newspapers.filter((item) => item.is_active === true).length
+    );
+
+    renderJobs(jobs);
+
+  } catch (error) {
+    showMessage(
+      "መረጃዎችን ማምጣት አልተቻለም። እባክዎ ገጹን ያድሱ።"
+    );
+    console.error("Dashboard loading error:", error);
+  }
+}
+
+async function logout() {
+  $("logoutButton").disabled = true;
+
+  try {
+    await requestJSON("/api/admin/logout", {
+      method: "POST"
+    });
+
+    window.location.replace("/admin.html");
+
+  } catch (error) {
+    showMessage("Logout አልተሳካም። እንደገና ይሞክሩ።");
+    $("logoutButton").disabled = false;
+  }
+}
+
+async function startDashboard() {
+  const authenticated = await checkSession();
+
+  if (!authenticated) return;
+
+  await loadDashboard();
+}
+
+$("logoutButton").addEventListener("click", logout);
+$("refreshButton").addEventListener("click", loadDashboard);
+
+startDashboard();
+</script>
+
+</body>
+</html>

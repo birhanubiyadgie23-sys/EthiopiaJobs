@@ -1227,6 +1227,7 @@ async function startDashboard() {
   if (!authenticated) return;
 
   await loadDashboard();
+  await loadSiteSettings().catch((error) => { $("settingsMessage").textContent = error.message; });
 }
 
 // ==========================================

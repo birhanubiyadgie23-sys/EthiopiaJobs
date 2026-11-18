@@ -354,7 +354,7 @@ function renderCategories() {
 
 async function loadCategories() {
   try {
-    const response = await fetch("/api/categories", {
+    const response = await fetch("/api/lookups?type=categories", {
       headers: { Accept: "application/json" },
       cache: "no-store"
     });
@@ -415,7 +415,7 @@ function renderLocationSuggestions() {
 
 async function loadLocations() {
   try {
-    const response = await fetch("/api/locations", {
+    const response = await fetch("/api/lookups?type=locations", {
       headers: { Accept: "application/json" },
       cache: "no-store"
     });

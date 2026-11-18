@@ -15,20 +15,25 @@ const DEFAULTS = {
 };
 
 async function ensureTables() {
-  await sql.query(`
+  // Neon HTTP queries execute one SQL statement at a time.
+  // Keep each CREATE TABLE in its own tagged query.
+  await sql`
     CREATE TABLE IF NOT EXISTS site_settings (
       setting_key TEXT PRIMARY KEY,
       setting_value JSONB NOT NULL,
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_by BIGINT REFERENCES admins(id) ON DELETE SET NULL
-    );
+    )
+  `;
+
+  await sql`
     CREATE TABLE IF NOT EXISTS site_settings_revisions (
       id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
       settings JSONB NOT NULL,
       changed_by BIGINT REFERENCES admins(id) ON DELETE SET NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-  `);
+    )
+  `;
 }
 
 async function readSettings() {

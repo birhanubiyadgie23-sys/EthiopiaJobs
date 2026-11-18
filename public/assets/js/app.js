@@ -116,6 +116,38 @@ async function loadSiteSettings() {
     const result = await response.json();
     siteSettings = result.data || {};
 
+    // Public contact details are intentionally rendered from the saved Site Settings.
+    const contactSection = $("#contact");
+    const contactDetails = $("#public-contact-details");
+    if (contactSection && contactDetails) {
+      const email = String(siteSettings.contact_email || "").trim();
+      const phone = String(siteSettings.contact_phone || "").trim();
+      contactDetails.replaceChildren();
+
+      if (email || phone) {
+        contactSection.hidden = false;
+        const eyebrow = $("#public-contact-eyebrow");
+        const title = $("#public-contact-title");
+        if (eyebrow) eyebrow.textContent = language === "am" ? "ያግኙን" : "CONTACT";
+        if (title) title.textContent = language === "am" ? "አግኙን" : "Contact us";
+
+        if (email) {
+          const link = document.createElement("a");
+          link.href = "mailto:" + email;
+          link.textContent = (language === "am" ? "ኢሜይል፦ " : "Email: ") + email;
+          contactDetails.appendChild(link);
+        }
+        if (phone) {
+          const link = document.createElement("a");
+          link.href = "tel:" + phone.replace(/[^+0-9]/g, "");
+          link.textContent = (language === "am" ? "ስልክ፦ " : "Phone: ") + phone;
+          contactDetails.appendChild(link);
+        }
+      } else {
+        contactSection.hidden = true;
+      }
+    }
+
     if (siteSettings.primary_color) {
       document.documentElement.style.setProperty("--navy", siteSettings.primary_color);
       document.documentElement.style.setProperty("--navy2", siteSettings.primary_color);

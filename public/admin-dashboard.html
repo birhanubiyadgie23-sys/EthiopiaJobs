@@ -495,6 +495,27 @@
     </form>
   </section>
 
+
+  <section class="panel" id="siteSettingsPanel">
+    <h3>የድረገጹ አጠቃላይ ቅንብሮች (Site Settings)</h3>
+    <p class="help">የድረገጹን ስም፣ መግለጫ፣ እውቂያ፣ ቀለምና ቋንቋ ያስተካክሉ።</p>
+    <form id="siteSettingsForm"><div class="form-grid">
+      <div class="field"><label for="site_name_am">የድረገጽ ስም (አማርኛ)</label><input id="site_name_am" maxlength="120"></div>
+      <div class="field"><label for="site_name_en">Website Name (English)</label><input id="site_name_en" maxlength="120"></div>
+      <div class="field"><label for="tagline_am">መግለጫ (አማርኛ)</label><input id="tagline_am" maxlength="250"></div>
+      <div class="field"><label for="tagline_en">Tagline (English)</label><input id="tagline_en" maxlength="250"></div>
+      <div class="field"><label for="contact_email">Contact Email</label><input id="contact_email" type="email" maxlength="254"></div>
+      <div class="field"><label for="contact_phone">Contact Phone</label><input id="contact_phone" maxlength="60"></div>
+      <div class="field"><label for="logo_url">Logo URL (HTTPS)</label><input id="logo_url" type="url" maxlength="2000"></div>
+      <div class="field"><label for="default_language">Default Language</label><select id="default_language"><option value="am">አማርኛ</option><option value="en">English</option></select></div>
+      <div class="field"><label for="primary_color">Primary Color</label><input id="primary_color" type="color"></div>
+      <div class="field"><label for="accent_color">Accent Color</label><input id="accent_color" type="color"></div>
+    </div><div class="actions" style="margin-top:18px">
+      <button type="submit" class="primary-button" id="saveSettingsButton">ቅንብሮቹን አስቀምጥ</button>
+      <button type="button" class="secondary-button" id="reloadSettingsButton">እንደገና ጫን</button>
+    </div><div id="settingsMessage" role="status" aria-live="polite"></div></form>
+  </section>
+
   <!-- JOBS TABLE -->
 
   <section class="panel">
@@ -528,6 +549,7 @@
 
     <div class="actions">
       <a class="nav-link" href="/">ዋናውን ድረገጽ ክፈት</a>
+      <a class="nav-link" href="/admin-accounts.html">Admin Accounts አስተዳድር</a>
 
       <button id="refreshButton" type="button">
         መረጃዎችን አድስ
@@ -780,7 +802,7 @@ function renderJobs(jobs) {
 
 async function checkSession() {
   try {
-    const result = await requestJSON("/api/admin/me");
+    const result = await requestJSON("/api/admin/login");
 
     if (!result.authenticated || !result.admin) {
       window.location.replace("/admin.html");
@@ -1159,6 +1181,46 @@ async function logout() {
 }
 
 // ==========================================
+
+const settingKeys = ["site_name_am","site_name_en","tagline_am","tagline_en","contact_email","contact_phone","logo_url","default_language","primary_color","accent_color"];
+async function loadSiteSettings() {
+  const result = await requestJSON("/api/site-settings");
+  settingKeys.forEach((key) => { $(key).value = result.data?.[key] ?? ""; });
+}
+async function saveSiteSettings(event) {
+  event.preventDefault();
+  const button = $("saveSettingsButton"), message = $("settingsMessage");
+  const payload = Object.fromEntries(settingKeys.map((key) => [key, $(key).value]));
+  button.disabled = true;
+  try {
+    await requestJSON("/api/site-settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    message.textContent = "ቅንብሮቹ ተቀምጠዋል።"; message.className = "success";
+  } catch(error) { message.textContent = error.message; message.className = "error"; }
+  finally { button.disabled = false; }
+}
+const translationPairs = [["title_am","title_en"],["description_am","description_en"],["requirements_am","requirements_en"],["application_method_am","application_method_en"]];
+async function translateField(sourceId,targetId,button) {
+  const text = $(sourceId).value.trim();
+  if (!text) { $("formMessage").textContent = "መጀመሪያ ጽሑፍ ያስገቡ።"; return; }
+  const source = sourceId.endsWith("_am") ? "am" : "en";
+  button.disabled = true; button.textContent = "በመተርጎም...";
+  try {
+    const result = await requestJSON("/api/site-settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"translate",text,source,target:source==="am"?"en":"am"})});
+    $(targetId).value = result.translatedText || "";
+    $("formMessage").textContent = "ትርጉሙን ያረጋግጡና ከዚያ ያስቀምጡ።"; $("formMessage").className="success";
+  } catch(error) { $("formMessage").textContent=error.message; $("formMessage").className="error"; }
+  finally { button.disabled=false; button.textContent=source==="am"?"ወደ English ተርጉም →":"→ ወደ አማርኛ ተርጉም"; }
+}
+function addTranslationControls() {
+  translationPairs.forEach(([am,en]) => [[am,en],[en,am]].forEach(([source,target]) => {
+    const field=$(source), button=document.createElement("button");
+    button.type="button"; button.className="secondary-button"; button.style.marginTop="6px";
+    button.textContent=source.endsWith("_am")?"ወደ English ተርጉም →":"→ ወደ አማርኛ ተርጉም";
+    button.addEventListener("click",()=>translateField(source,target,button));
+    field.insertAdjacentElement("afterend",button);
+  }));
+}
+
 // START DASHBOARD
 // ==========================================
 
@@ -1168,6 +1230,7 @@ async function startDashboard() {
   if (!authenticated) return;
 
   await loadDashboard();
+  await loadSiteSettings().catch((error) => { $("settingsMessage").textContent = error.message; });
 }
 
 // ==========================================
@@ -1175,6 +1238,9 @@ async function startDashboard() {
 // ==========================================
 
 $("jobForm").addEventListener("submit", createJob);
+$("siteSettingsForm").addEventListener("submit", saveSiteSettings);
+$("reloadSettingsButton").addEventListener("click", () => loadSiteSettings().catch((error) => { $("settingsMessage").textContent = error.message; }));
+addTranslationControls();
 
 $("cancelEditButton").addEventListener("click", () => {
   resetJobForm();

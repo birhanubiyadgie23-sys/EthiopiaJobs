@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin Accounts | Ethiopia Jobs</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1f5f9;color:#1e293b;font-family:Arial,sans-serif}
+header{background:#123b66;color:#fff;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{font-size:21px;margin:0}a,button{cursor:pointer}a{color:#123b66}
+main{max-width:950px;margin:28px auto;padding:0 16px}.panel{background:#fff;border-radius:12px;padding:22px;margin-bottom:20px;box-shadow:0 2px 8px #0000000d}
+h2{margin:0 0 16px;color:#123b66;font-size:20px}.help{color:#64748b;font-size:13px;line-height:1.6}
+label{display:block;font-weight:bold;font-size:14px;margin:12px 0 6px}
+input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:7px;font-size:15px}
+button{border:0;border-radius:7px;padding:10px 14px;font-weight:bold;background:#123b66;color:#fff}
+button:disabled{opacity:.6;cursor:wait}.danger{background:#dc2626}.muted{background:#e2e8f0;color:#123b66}
+form{max-width:520px}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.message{margin-top:12px;font-size:14px;line-height:1.5}.error{color:#b91c1c}.success{color:#15803d}
+.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:550px}th,td{text-align:left;padding:12px;border-bottom:1px solid #e2e8f0;font-size:14px}th{background:#f8fafc;color:#475569}
+.status{display:inline-block;padding:4px 9px;border-radius:20px;background:#dcfce7;color:#166534;font-size:12px}.status.off{background:#fee2e2;color:#991b1b}
+.actions{display:flex;gap:8px;flex-wrap:wrap}footer{text-align:center;color:#64748b;padding:24px;font-size:13px}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}.panel{padding:16px}}
+</style>
+</head>
+<body>
+<header><h1>Ethiopia Jobs — Admin Accounts</h1><div class="actions"><a href="/admin-dashboard.html" style="color:white">← Dashboard</a><button id="logout" class="danger" type="button">Logout</button></div></header>
+<main>
+<section class="panel">
+<h2>አዲስ Admin Account ፍጠር</h2>
+<p class="help">የሚፈጥሩት መለያ የAdmin ፈቃድ ይኖረዋል። Password ቢያንስ 12 ቁምፊ ይሁን።</p>
+<form id="createForm">
+<div class="form-row"><div><label for="email">Admin Email</label><input id="email" type="email" maxlength="254" autocomplete="username" required></div>
+<div><label for="password">Temporary Password</label><input id="password" type="password" minlength="12" maxlength="128" autocomplete="new-password" required></div></div>
+<p class="help">መለያውን የሚቀበለው ሰው በመጀመሪያ ግቤት ጊዜ የራሱን ጠንካራ Password እንዲጠቀም በደህንነት ያስረክቡት።</p>
+<button id="createButton" type="submit">Admin Account ፍጠር</button><div id="createMessage" class="message" role="status"></div>
+</form>
+</section>
+<section class="panel">
+<h2>የAdmin መለያዎች</h2><p class="help">ንቁ መለያን ማጥፋት ወይም የተዘጋ መለያን እንደገና ማንቃት ይችላሉ። ቢያንስ አንድ Admin ንቁ መቆየት አለበት።</p>
+<div class="table-wrap"><table><thead><tr><th>Email</th><th>Status</th><th>Created</th><th>Action</th></tr></thead><tbody id="accounts"><tr><td colspan="4">በመጫን ላይ...</td></tr></tbody></table></div>
+<div id="listMessage" class="message" role="status"></div>
+</section>
+</main><footer>Ethiopia Jobs — Secure Admin Area</footer>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+async function request(url,options={}){
+ const response=await fetch(url,{credentials:"same-origin",cache:"no-store",...options});
+ const result=await response.json().catch(()=>({}));
+ if(!response.ok)throw new Error(result.error||"Request failed");
+ return result;
+}
+function show(id,message,type=""){const el=$(id);el.textContent=message;el.className="message "+type;}
+async function checkSession(){
+ try{const r=await request("/api/admin/login");if(!r.authenticated)throw new Error("Unauthorized");window.currentAdminId=r.admin?.id;}
+ catch{location.replace("/admin");return false;}return true;
+}
+function render(rows){
+ const body=$("accounts");body.replaceChildren();
+ if(!rows.length){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=4;td.textContent="Admin መለያ አልተገኘም።";tr.append(td);body.append(tr);return;}
+ rows.forEach(item=>{
+  const tr=document.createElement("tr"),email=document.createElement("td"),status=document.createElement("td"),created=document.createElement("td"),action=document.createElement("td");
+  email.textContent=item.email;
+  const badge=document.createElement("span");badge.className="status"+(item.is_active?"":" off");badge.textContent=item.is_active?"Active":"Inactive";status.append(badge);
+  created.textContent=item.created_at?new Date(item.created_at).toLocaleDateString():"—";
+  const button=document.createElement("button");button.type="button";button.className=item.is_active?"danger":"muted";button.textContent=item.is_active?"Deactivate":"Activate";
+  button.disabled=String(item.id)===String(window.currentAdminId);
+  button.addEventListener("click",async()=>{
+   if(!confirm((item.is_active?"Deactivate ":"Activate ")+item.email+"?"))return;
+   button.disabled=true;
+   try{await request("/api/admin/accounts",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:String(item.id),is_active:!item.is_active})});await load();}
+   catch(e){show("listMessage",e.message,"error");button.disabled=false;}
+  });
+  action.append(button);tr.append(email,status,created,action);body.append(tr);
+ });
+}
+async function load(){
+ const r=await request("/api/admin/accounts");render(r.data||[]);show("listMessage","");
+}
+$("createForm").addEventListener("submit",async e=>{
+ e.preventDefault();const button=$("createButton");button.disabled=true;show("createMessage","");
+ try{
+  await request("/api/admin/accounts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:$("email").value.trim(),password:$("password").value})});
+  $("createForm").reset();show("createMessage","Admin መለያው ተፈጥሯል።","success");await load();
+ }catch(error){show("createMessage",error.message,"error");}
+ finally{button.disabled=false;}
+});
+$("logout").addEventListener("click",async()=>{try{await request("/api/admin/logout",{method:"POST"});}finally{location.replace("/admin");}});
+(async()=>{if(await checkSession()){try{await load();}catch(e){show("listMessage",e.message,"error");}}})();
+</script>
+</body></html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="am">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fffaf1">
+  <title>የተጠቃሚ መግቢያ | Ethiopia Jobs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Ethiopic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:28px 18px;display:grid;place-items:center;background:radial-gradient(circle at 12% 12%,#dff5e9 0,transparent 30%),radial-gradient(circle at 88% 85%,#ffe4d7 0,transparent 32%),#fffaf1;color:#183b35;font-family:Inter,"Noto Sans Ethiopic",sans-serif}
+    .shell{width:min(100%,980px);display:grid;grid-template-columns:1fr 1fr;overflow:hidden;border:1px solid #e9eee5;border-radius:28px;background:#fff;box-shadow:0 28px 80px #315b4718}
+    .intro{padding:54px 44px;background:linear-gradient(145deg,#e5f6ec,#fdf0e5);display:flex;flex-direction:column;justify-content:space-between;min-height:590px}
+    .brand{font-weight:800;font-size:20px;color:#176b55;text-decoration:none}.brand span{display:inline-grid;place-items:center;width:38px;height:38px;margin-right:9px;border-radius:12px;background:#176b55;color:white}
+    .intro h1{font-size:clamp(30px,4vw,46px);line-height:1.2;margin:55px 0 16px;letter-spacing:-1.5px}.intro p{color:#58756a;line-height:1.9;font-size:16px;max-width:370px}.note{padding:16px 18px;border:1px solid #d4e8da;border-radius:16px;background:#ffffffa8;color:#477263;font-size:13px;line-height:1.7}
+    .panel{padding:48px 44px;display:flex;flex-direction:column;justify-content:center}.tabs{display:flex;padding:5px;border-radius:14px;background:#f2f6f1;gap:5px;margin:0 0 30px}.tabs button{flex:1;border:0;border-radius:10px;padding:12px 8px;background:transparent;color:#6d8178;font-weight:800;cursor:pointer}.tabs button.active{background:white;color:#176b55;box-shadow:0 3px 12px #1d56351a}
+    h2{margin:0 0 8px;font-size:28px}.sub{margin:0 0 24px;color:#718078;line-height:1.7;font-size:14px}
+    label{display:block;margin:15px 0 7px;font-size:13px;font-weight:700;color:#405b50}input{width:100%;height:48px;border:1px solid #dce6df;border-radius:12px;padding:0 14px;font:inherit;color:#183b35;background:#fcfdfb}input:focus{outline:3px solid #d9f0e2;border-color:#58a982}
+    .submit{width:100%;height:50px;margin-top:24px;border:0;border-radius:13px;background:linear-gradient(100deg,#176b55,#279779);color:white;font:inherit;font-weight:800;cursor:pointer;box-shadow:0 10px 20px #176b5526}.submit:disabled{opacity:.6;cursor:wait}
+    #message{min-height:44px;margin-top:16px;color:#a63d35;font-size:13px;line-height:1.7}#message.success{color:#19734f}.home{display:inline-block;margin-top:12px;color:#357a64;text-decoration:none;font-weight:700;font-size:13px}
+    .hidden{display:none!important}
+    @media(max-width:720px){.shell{grid-template-columns:1fr;max-width:470px}.intro{min-height:0;padding:28px 28px}.intro h1{margin:28px 0 10px;font-size:32px}.note{margin-top:20px}.panel{padding:30px 28px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="intro">
+      <a class="brand" href="/"><span>EJ</span>Ethiopia Jobs</a>
+      <div>
+        <h1>የሥራ ዕድሎችን በአንድ ቦታ ይከታተሉ።</h1>
+        <p>በፈቃድዎ አካውንት ይፍጠሩ፤ በቀጣይ ጊዜ በቀላሉ ይግቡ። ይህ የተጠቃሚ አካውንት ከአድሚን አካውንት የተለየ ነው።</p>
+      </div>
+      <div class="note">የግል አካውንትዎን በኢሜይልና በይለፍ ቃል ይጠብቁ። ለደህንነት ቢያንስ 12 ቁምፊ ያለው Password ይጠቀሙ።</div>
+    </section>
+    <section class="panel">
+      <div class="tabs" role="tablist" aria-label="User account">
+        <button type="button" id="loginTab" class="active">መግቢያ</button>
+        <button type="button" id="registerTab">አዲስ ምዝገባ</button>
+      </div>
+      <form id="authForm">
+        <h2 id="formTitle">ወደ አካውንትዎ ይግቡ</h2>
+        <p class="sub" id="formSub">የተመዘገቡበትን ኢሜይልና Password ያስገቡ።</p>
+        <div id="nameField" class="hidden">
+          <label for="displayName">ሙሉ ስም</label>
+          <input id="displayName" name="display_name" autocomplete="name" maxlength="100">
+        </div>
+        <label for="email">ኢሜይል</label>
+        <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required>
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" required>
+        <button class="submit" id="submitButton" type="submit">Login</button>
+        <div id="message" role="status" aria-live="polite"></div>
+      </form>
+      <a class="home" href="/">← ወደ ዋናው ገጽ ተመለስ</a>
+    </section>
+  </main>
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+let mode="login";
+function setMode(next){
+  mode=next;
+  $("#loginTab").classList.toggle("active",mode==="login");
+  $("#registerTab").classList.toggle("active",mode==="register");
+  $("#nameField").classList.toggle("hidden",mode!=="register");
+  $("#displayName").required=mode==="register";
+  $("#formTitle").textContent=mode==="login"?"ወደ አካውንትዎ ይግቡ":"አዲስ አካውንት ይፍጠሩ";
+  $("#formSub").textContent=mode==="login"?"የተመዘገቡበትን ኢሜይልና Password ያስገቡ።":"በፈቃድዎ ተመዝግበው የተጠቃሚ አካውንት ይፍጠሩ።";
+  $("#submitButton").textContent=mode==="login"?"Login":"አካውንት ፍጠር";
+  $("#password").autocomplete=mode==="login"?"current-password":"new-password";
+  $("#message").textContent="";
+  $("#message").className="";
+}
+$("#loginTab").addEventListener("click",()=>setMode("login"));
+$("#registerTab").addEventListener("click",()=>setMode("register"));
+$("#authForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const button=$("#submitButton"),message=$("#message");
+  button.disabled=true;message.textContent="በመላክ ላይ...";message.className="";
+  const body={action:mode,email:$("#email").value.trim(),password:$("#password").value};
+  if(mode==="register")body.display_name=$("#displayName").value.trim();
+  try{
+    const response=await fetch("/api/user-auth",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const result=await response.json();
+    if(!response.ok||!result.ok)throw new Error(result.error||"ሂደቱ አልተሳካም።");
+    message.textContent=mode==="register"?"ምዝገባው ተሳክቷል። አካውንትዎ ተፈጥሯል።":"በተሳካ ሁኔታ ገብተዋል።";
+    message.className="success";
+    $("#authForm").reset();
+  }catch(error){message.textContent=error.message||"የኔትወርክ ችግር ተፈጥሯል።";}
+  finally{button.disabled=false;}
+});
+(async()=>{
+  try{
+    const r=await fetch("/api/user-auth",{credentials:"same-origin",cache:"no-store"});
+    const d=await r.json();
+    if(d.authenticated&&d.user){$("#formTitle").textContent="አካውንትዎ ክፍት ነው";$("#formSub").textContent=d.user.display_name+" · "+d.user.email;$("#authForm").classList.add("hidden");$("#loginTab").classList.add("hidden");$("#registerTab").classList.add("hidden");const out=document.createElement("button");out.type="button";out.className="submit";out.textContent="Logout";out.addEventListener("click",async()=>{await fetch("/api/user-auth",{method:"DELETE",credentials:"same-origin"});location.reload();});$("#formSub").after(out);}
+  }catch(e){console.warn("Unable to check user session",e);}
+})();
+</script>
+</body>
+</html>

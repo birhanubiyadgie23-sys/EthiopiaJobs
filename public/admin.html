@@ -161,10 +161,10 @@
           );
         }
 
-        message.textContent = "Login ተሳክቷል።";
+        message.textContent = "Login ተሳክቷል። Dashboard በመክፈት ላይ...";
         message.className = "success";
 
-        form.reset();
+        window.location.replace("/admin-dashboard.html");
 
       } catch (error) {
         message.textContent =

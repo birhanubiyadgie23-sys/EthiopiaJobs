@@ -1,4 +1,5 @@
 import { sql } from "../_lib/db.js";
+import { requireAdmin } from "../_lib/admin-auth.js";
 import {
   scrypt as scryptCallback,
   timingSafeEqual,
@@ -9,8 +10,8 @@ import { promisify } from "node:util";
 const scrypt = promisify(scryptCallback);
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
+  if (req.method !== "GET" && req.method !== "POST") {
+    res.setHeader("Allow", "GET, POST");
     return res.status(405).json({
       ok: false,
       error: "Method not allowed"
@@ -18,6 +19,12 @@ export default async function handler(req, res) {
   }
 
   try {
+    if (req.method === "GET") {
+      const admin = await requireAdmin(req, res);
+      if (!admin) return;
+      return res.status(200).json({ ok: true, authenticated: true, admin });
+    }
+
     const { email, password } = req.body || {};
     const sessionSecret = process.env.ADMIN_SESSION_SECRET;
 

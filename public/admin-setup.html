@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Setup | Ethiopia Jobs</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+    }
+
+    .setup-box {
+      width: 100%;
+      max-width: 430px;
+      padding: 32px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      text-align: center;
+      color: #123b66;
+      font-size: 25px;
+    }
+
+    .subtitle {
+      margin-bottom: 25px;
+      text-align: center;
+      color: #64748b;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 7px;
+      font-weight: bold;
+      color: #334155;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      border: 0;
+      border-radius: 8px;
+      background: #123b66;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #message {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 14px;
+      color: #dc2626;
+    }
+
+    #message.success {
+      color: #15803d;
+    }
+
+    .note {
+      margin-top: 18px;
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="setup-box">
+    <h1>Ethiopia Jobs</h1>
+    <p class="subtitle">የመጀመሪያ Admin መለያ ማዘጋጃ</p>
+
+    <form id="setupForm">
+      <label for="email">Admin Email</label>
+      <input
+        type="email"
+        id="email"
+        autocomplete="username"
+        maxlength="254"
+        required
+      >
+
+      <label for="password">አዲስ Password</label>
+      <input
+        type="password"
+        id="password"
+        autocomplete="new-password"
+        minlength="12"
+        maxlength="128"
+        required
+      >
+
+      <label for="setupSecret">Setup Secret</label>
+      <input
+        type="password"
+        id="setupSecret"
+        autocomplete="off"
+        required
+      >
+
+      <button type="submit" id="setupButton">
+        Create Admin Account
+      </button>
+
+      <div id="message" role="status" aria-live="polite"></div>
+    </form>
+
+    <p class="note">
+      Password ቢያንስ 12 ቁምፊ መሆን አለበት።
+      Setup Secret በVercel Environment Variables ውስጥ
+      ያስቀመጥከው እሴት ነው።
+    </p>
+  </main>
+
+  <script>
+    const form = document.getElementById("setupForm");
+    const button = document.getElementById("setupButton");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      message.textContent = "";
+      message.className = "";
+      button.disabled = true;
+      button.textContent = "በማዘጋጀት ላይ...";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const setupSecret =
+        document.getElementById("setupSecret").value;
+
+      try {
+        const response = await fetch("/api/admin/setup", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            setupSecret
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.ok) {
+          throw new Error(
+            result.error || "Admin account setup failed"
+          );
+        }
+
+        message.textContent =
+          "Admin መለያው በተሳካ ሁኔታ ተፈጥሯል።";
+        message.className = "success";
+
+        form.reset();
+      } catch (error) {
+        message.textContent =
+          error.message || "ስህተት ተፈጥሯል።";
+      } finally {
+        button.disabled = false;
+        button.textContent = "Create Admin Account";
+      }
+    });
+  </script>
+</body>
+</html>

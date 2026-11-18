@@ -2320,3 +2320,28 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .art-orbit, .art-card-main, .art-card-small { animation: none !important; }
   .job-card, .search-button, .pagination button { transition: none !important; }
 }
+
+
+/* Public user account entry */
+.user-auth-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(24, 104, 84, .18);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #e7f7ef, #fff1e7);
+  color: #176b55;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 8px 22px rgba(28, 94, 72, .08);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.user-auth-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(28, 94, 72, .14);
+}
+@media (max-width: 560px) {
+  .user-auth-link { min-height: 38px; padding: 0 12px; font-size: 13px; }
+}

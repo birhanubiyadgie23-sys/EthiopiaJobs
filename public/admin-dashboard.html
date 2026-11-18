@@ -630,7 +630,9 @@
 "use strict";
 
 const $ = (id) => document.getElementById(id);
-
+let adminJobs = [];
+let editingJobId = null;
+  
 async function requestJSON(url, options = {}) {
   const response = await fetch(url, {
     credentials: "same-origin",

@@ -86,6 +86,63 @@ let totalJobs = 0;
 let jobs = [];
 let loadingFailed = false;
 let requestNumber = 0;
+let siteSettings = {};
+
+function applySiteSettingsLanguage() {
+  const siteName = siteSettings[language === "am" ? "site_name_am" : "site_name_en"];
+  const tagline = siteSettings[language === "am" ? "tagline_am" : "tagline_en"];
+
+  if (siteName) {
+    document.title = siteName + " | " + (language === "am" ? "የሥራ ማስታወቂያዎች" : "Jobs");
+    const headerBrand = document.querySelector(".site-header .brand > span:last-child");
+    const footerBrand = document.querySelector(".footer-brand > span:last-child");
+    if (headerBrand) headerBrand.textContent = siteName;
+    if (footerBrand) footerBrand.textContent = siteName;
+  }
+
+  if (tagline) {
+    const heroText = document.querySelector(".hero-content > p");
+    if (heroText) heroText.textContent = tagline;
+  }
+}
+
+async function loadSiteSettings() {
+  try {
+    const response = await fetch("/api/site-settings", {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    });
+    if (!response.ok) return;
+    const result = await response.json();
+    siteSettings = result.data || {};
+
+    if (siteSettings.primary_color) {
+      document.documentElement.style.setProperty("--navy", siteSettings.primary_color);
+      document.documentElement.style.setProperty("--navy2", siteSettings.primary_color);
+      document.documentElement.style.setProperty("--primary", siteSettings.primary_color);
+    }
+    if (siteSettings.accent_color) {
+      document.documentElement.style.setProperty("--gold", siteSettings.accent_color);
+      document.documentElement.style.setProperty("--accent", siteSettings.accent_color);
+    }
+    if (siteSettings.logo_url) {
+      const mark = document.querySelector(".site-header .brand-mark");
+      if (mark) {
+        const logo = document.createElement("img");
+        logo.src = siteSettings.logo_url;
+        logo.alt = siteSettings.site_name_en || "Site logo";
+        logo.width = 38;
+        logo.height = 38;
+        logo.loading = "lazy";
+        logo.style.objectFit = "contain";
+        mark.replaceWith(logo);
+      }
+    }
+    applySiteSettingsLanguage();
+  } catch (error) {
+    console.warn("Unable to load site settings:", error);
+  }
+}
 
 let categories = [];
 let locations = [];
@@ -405,6 +462,7 @@ function scheduleJobSuggestions(query) {
 function setLanguage(nextLanguage) {
   language = nextLanguage;
   document.documentElement.lang = language;
+  applySiteSettingsLanguage();
 
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     const translation =
@@ -578,6 +636,7 @@ if (yearElement) {
 }
 
 setLanguage("am");
+loadSiteSettings();
 loadCategories();
 loadLocations();
 loadJobs();

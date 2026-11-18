@@ -283,7 +283,15 @@
     .job-action-button.draft {
       background: #d97706;
     }
+.job-action-button.edit {
+  background: #2563eb;
+}
 
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
     footer {
       text-align: center;
       padding: 25px;
@@ -721,7 +729,9 @@ function renderJobs(jobs) {
   const tbody = $("jobsTable");
   tbody.replaceChildren();
 
-  if (!Array.isArray(jobs) || jobs.length === 0) {
+  adminJobs = Array.isArray(jobs) ? jobs : [];
+
+  if (adminJobs.length === 0) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
 
@@ -734,7 +744,7 @@ function renderJobs(jobs) {
     return;
   }
 
-  jobs.forEach((job) => {
+  adminJobs.forEach((job) => {
     const row = document.createElement("tr");
 
     const title = document.createElement("td");
@@ -758,26 +768,42 @@ function renderJobs(jobs) {
     date.textContent = formatDate(job.published_at);
 
     const actionCell = document.createElement("td");
-    const button = document.createElement("button");
+    const buttons = document.createElement("div");
 
-    button.type = "button";
-    button.className = "job-action-button";
-    button.dataset.jobId = String(job.id);
+    buttons.className = "action-buttons";
+
+    // Edit button
+    const editButton = document.createElement("button");
+
+    editButton.type = "button";
+    editButton.textContent = "Edit";
+    editButton.className = "job-action-button edit";
+    editButton.dataset.editJobId = String(job.id);
+
+    buttons.appendChild(editButton);
+
+    // Publish / Draft button
+    const statusButton = document.createElement("button");
+
+    statusButton.type = "button";
+    statusButton.className = "job-action-button";
+    statusButton.dataset.jobId = String(job.id);
 
     if (job.status === "published") {
-      button.textContent = "Draft አድርግ";
-      button.dataset.nextStatus = "draft";
-      button.classList.add("draft");
+      statusButton.textContent = "Draft አድርግ";
+      statusButton.dataset.nextStatus = "draft";
+      statusButton.classList.add("draft");
     } else if (job.status === "draft") {
-      button.textContent = "Publish አድርግ";
-      button.dataset.nextStatus = "published";
-      button.classList.add("publish");
+      statusButton.textContent = "Publish አድርግ";
+      statusButton.dataset.nextStatus = "published";
+      statusButton.classList.add("publish");
     } else {
-      button.textContent = "ማቀየር አይቻልም";
-      button.disabled = true;
+      statusButton.textContent = "ማቀየር አይቻልም";
+      statusButton.disabled = true;
     }
 
-    actionCell.appendChild(button);
+    buttons.appendChild(statusButton);
+    actionCell.appendChild(buttons);
 
     row.append(
       title,

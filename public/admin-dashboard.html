@@ -8,9 +8,7 @@
   <title>Admin Dashboard | Ethiopia Jobs</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -71,9 +69,7 @@
       padding: 0 20px;
     }
 
-    .welcome {
-      margin-bottom: 25px;
-    }
+    .welcome { margin-bottom: 25px; }
 
     .welcome h2 {
       margin: 0 0 7px;
@@ -135,9 +131,7 @@
       gap: 7px;
     }
 
-    .field.full {
-      grid-column: 1 / -1;
-    }
+    .field.full { grid-column: 1 / -1; }
 
     label {
       font-size: 14px;
@@ -191,22 +185,15 @@
       line-height: 1.6;
     }
 
-    .success {
-      color: #15803d;
-    }
+    .success { color: #15803d; }
+    .error { color: #dc2626; }
 
-    .error {
-      color: #dc2626;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-    }
+    .table-wrap { overflow-x: auto; }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 650px;
+      min-width: 850px;
     }
 
     th, td {
@@ -246,6 +233,25 @@
       color: #64748b;
     }
 
+    .job-action-button {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .job-action-button.publish { background: #15803d; }
+    .job-action-button.draft { background: #d97706; }
+    .job-action-button.edit { background: #2563eb; }
+    .job-action-button.delete { background: #dc2626; }
+
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -270,38 +276,6 @@
       color: #dc2626;
     }
 
-    .job-action-button {
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: bold;
-      color: white;
-    }
-
-    .job-action-button.publish {
-      background: #15803d;
-    }
-
-    .job-action-button.draft {
-      background: #d97706;
-    }
-
-    .job-action-button.edit {
-      background: #2563eb;
-    }
-
-    .action-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .form-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
     footer {
       text-align: center;
       padding: 25px;
@@ -310,26 +284,18 @@
     }
 
     @media (max-width: 650px) {
-      header {
-        padding: 16px;
-      }
+      header { padding: 16px; }
 
       main {
         margin-top: 22px;
         padding: 0 12px;
       }
 
-      .panel {
-        padding: 15px;
-      }
+      .panel { padding: 15px; }
 
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
+      .form-grid { grid-template-columns: 1fr; }
 
-      .field.full {
-        grid-column: auto;
-      }
+      .field.full { grid-column: auto; }
     }
   </style>
 </head>
@@ -381,16 +347,17 @@
     </div>
   </section>
 
+  <!-- JOB FORM -->
+
   <section class="panel">
     <h3 id="jobFormTitle">አዲስ የስራ ማስታወቂያ ጨምር</h3>
 
     <p class="help">
-      የስራ ማስታወቂያው መጀመሪያ Draft ሆኖ ይቀመጣል።
-      ከማተም በፊት መረጃውን መፈተሽ ያስፈልጋል።
+      አዲስ ማስታወቂያ Draft ሆኖ ይቀመጣል።
+      ከማተም በፊት መረጃውን አረጋግጥ።
     </p>
 
     <form id="jobForm">
-
       <div class="form-grid">
 
         <div class="field">
@@ -435,8 +402,7 @@
         <div class="field">
           <label for="education_level">የትምህርት ደረጃ</label>
           <input id="education_level" name="education_level"
-            type="text" maxlength="150"
-            placeholder="Degree, Diploma...">
+            type="text" maxlength="150">
         </div>
 
         <div class="field">
@@ -507,13 +473,12 @@
         <div class="field">
           <label for="source_reference">የመረጃ ምንጭ / Reference</label>
           <input id="source_reference" name="source_reference"
-            type="text" maxlength="2000"
-            placeholder="የጋዜጣ ስም፣ ሊንክ...">
+            type="text" maxlength="2000">
         </div>
 
       </div>
 
-      <div class="form-actions" style="margin-top:22px">
+      <div class="actions" style="margin-top:22px">
         <button type="submit" id="saveJobButton"
           class="primary-button">
           ስራውን Draft አድርገህ አስቀምጥ
@@ -527,9 +492,10 @@
 
       <div id="formMessage" role="status"
         aria-live="polite"></div>
-
     </form>
   </section>
+
+  <!-- JOBS TABLE -->
 
   <section class="panel">
     <h3>የቅርብ ጊዜ የስራ ማስታወቂያዎች</h3>
@@ -651,7 +617,7 @@ function addOption(select, value, label) {
 }
 
 // ==========================================
-// CATEGORY AND LOCATION LISTS
+// CATEGORIES AND LOCATIONS
 // ==========================================
 
 function renderCategories(categories) {
@@ -700,7 +666,7 @@ function renderLocations(locations) {
 }
 
 // ==========================================
-// RENDER JOB TABLE
+// RENDER JOBS
 // ==========================================
 
 function renderJobs(jobs) {
@@ -750,7 +716,9 @@ function renderJobs(jobs) {
 
     buttons.className = "action-buttons";
 
+    // EDIT BUTTON
     const editButton = document.createElement("button");
+
     editButton.type = "button";
     editButton.textContent = "Edit";
     editButton.className = "job-action-button edit";
@@ -758,6 +726,7 @@ function renderJobs(jobs) {
 
     buttons.appendChild(editButton);
 
+    // PUBLISH / DRAFT BUTTON
     const statusButton = document.createElement("button");
 
     statusButton.type = "button";
@@ -778,6 +747,19 @@ function renderJobs(jobs) {
     }
 
     buttons.appendChild(statusButton);
+
+    // DELETE BUTTON - DRAFT ONLY
+    if (job.status === "draft") {
+      const deleteButton = document.createElement("button");
+
+      deleteButton.type = "button";
+      deleteButton.textContent = "Delete";
+      deleteButton.className = "job-action-button delete";
+      deleteButton.dataset.deleteJobId = String(job.id);
+
+      buttons.appendChild(deleteButton);
+    }
+
     actionCell.appendChild(buttons);
 
     row.append(
@@ -793,7 +775,7 @@ function renderJobs(jobs) {
 }
 
 // ==========================================
-// ADMIN SESSION
+// SESSION VERIFICATION
 // ==========================================
 
 async function checkSession() {
@@ -815,7 +797,7 @@ async function checkSession() {
 }
 
 // ==========================================
-// LOAD DASHBOARD DATA
+// LOAD DASHBOARD
 // ==========================================
 
 async function loadDashboard() {
@@ -882,28 +864,25 @@ async function loadDashboard() {
 }
 
 // ==========================================
-// FORM MODE AND RESET
+// FORM MODE
 // ==========================================
 
 function setFormMode(isEditing) {
-  const title = $("jobFormTitle");
-  const button = $("saveJobButton");
-  const cancelButton = $("cancelEditButton");
+  $("jobFormTitle").textContent = isEditing
+    ? "የስራ ማስታወቂያ አስተካክል"
+    : "አዲስ የስራ ማስታወቂያ ጨምር";
 
-  if (isEditing) {
-    title.textContent = "የስራ ማስታወቂያ አስተካክል";
-    button.textContent = "ለውጦቹን አስቀምጥ";
-    cancelButton.hidden = false;
-  } else {
-    title.textContent = "አዲስ የስራ ማስታወቂያ ጨምር";
-    button.textContent = "ስራውን Draft አድርገህ አስቀምጥ";
-    cancelButton.hidden = true;
-  }
+  $("saveJobButton").textContent = isEditing
+    ? "ለውጦቹን አስቀምጥ"
+    : "ስራውን Draft አድርገህ አስቀምጥ";
+
+  $("cancelEditButton").hidden = !isEditing;
 }
 
 function resetJobForm(clearMessage = true) {
   $("jobForm").reset();
   editingJobId = null;
+
   setFormMode(false);
 
   if (clearMessage) {
@@ -922,9 +901,7 @@ function startEditingJob(id) {
   );
 
   if (!job) {
-    showMessage(
-      "የተመረጠው ስራ አልተገኘም። መረጃዎችን አድስና እንደገና ሞክር።"
-    );
+    showMessage("የተመረጠው ስራ አልተገኘም።");
     return;
   }
 
@@ -961,10 +938,7 @@ function startEditingJob(id) {
         ? String(value).slice(0, 10)
         : "";
     } else {
-      input.value =
-        value === null || value === undefined
-          ? ""
-          : String(value);
+      input.value = value ?? "";
     }
   });
 
@@ -1029,13 +1003,13 @@ async function createJob(event) {
 
     resetJobForm(false);
 
+    await loadDashboard();
+
     message.textContent = isEditing
       ? "የስራ መረጃው በተሳካ ሁኔታ ተስተካክሏል።"
       : "ስራው በተሳካ ሁኔታ Draft ሆኖ ተቀምጧል።";
 
     message.className = "success";
-
-    await loadDashboard();
 
   } catch (error) {
     message.textContent =
@@ -1050,7 +1024,7 @@ async function createJob(event) {
 }
 
 // ==========================================
-// CHANGE JOB STATUS
+// PUBLISH / DRAFT
 // ==========================================
 
 async function changeJobStatus(id, nextStatus, button = null) {
@@ -1082,6 +1056,7 @@ async function changeJobStatus(id, nextStatus, button = null) {
     );
 
     await loadDashboard();
+    showMessage("የስራው ሁኔታ ተቀይሯል።");
 
   } catch (error) {
     showMessage(
@@ -1089,6 +1064,74 @@ async function changeJobStatus(id, nextStatus, button = null) {
     );
 
     if (button) button.disabled = false;
+  }
+}
+
+// ==========================================
+// DELETE DRAFT JOB
+// ==========================================
+
+async function deleteJob(id, button = null) {
+  const job = adminJobs.find(
+    (item) => String(item.id) === String(id)
+  );
+
+  if (!job) {
+    showMessage("የተመረጠው ስራ አልተገኘም።");
+    return;
+  }
+
+  if (job.status !== "draft") {
+    showMessage(
+      "Draft የሆኑ ስራዎችን ብቻ ማጥፋት ይቻላል።"
+    );
+    return;
+  }
+
+  const confirmed = window.confirm(
+    `የ"${job.title_am}" ማስታወቂያን ማጥፋት ትፈልጋለህ?\n\nይህ ተግባር መመለስ አይቻልም።`
+  );
+
+  if (!confirmed) return;
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "በማጥፋት ላይ...";
+  }
+
+  try {
+    const result = await requestJSON(
+      `/api/admin/jobs?id=${encodeURIComponent(id)}`,
+      {
+        method: "DELETE"
+      }
+    );
+
+    if (!result.ok) {
+      throw new Error(
+        result.error || "ስራውን ማጥፋት አልተቻለም።"
+      );
+    }
+
+    if (editingJobId === String(id)) {
+      resetJobForm();
+    }
+
+    await loadDashboard();
+
+    showMessage(
+      "የDraft ማስታወቂያው በተሳካ ሁኔታ ተሰርዟል።"
+    );
+
+  } catch (error) {
+    showMessage(
+      error.message || "ስራውን ማጥፋት አልተቻለም።"
+    );
+
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Delete";
+    }
   }
 }
 
@@ -1148,6 +1191,18 @@ $("jobsTable").addEventListener("click", (event) => {
 
   if (editButton) {
     startEditingJob(editButton.dataset.editJobId);
+    return;
+  }
+
+  const deleteButton = event.target.closest(
+    "button[data-delete-job-id]"
+  );
+
+  if (deleteButton) {
+    deleteJob(
+      deleteButton.dataset.deleteJobId,
+      deleteButton
+    );
     return;
   }
 

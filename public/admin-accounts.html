@@ -52,7 +52,7 @@ async function request(url,options={}){
 }
 function show(id,message,type=""){const el=$(id);el.textContent=message;el.className="message "+type;}
 async function checkSession(){
- try{const r=await request("/api/admin/login");if(!r.authenticated)throw new Error("Unauthorized");}
+ try{const r=await request("/api/admin/login");if(!r.authenticated)throw new Error("Unauthorized");window.currentAdminId=r.admin?.id;}
  catch{location.replace("/admin");return false;}return true;
 }
 function render(rows){

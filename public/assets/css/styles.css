@@ -2345,3 +2345,50 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 560px) {
   .user-auth-link { min-height: 38px; padding: 0 12px; font-size: 13px; }
 }
+
+
+/* Public contact details from Site Settings */
+.contact-section {
+  padding: 58px 24px;
+  background: linear-gradient(120deg, #f2f8ef 0%, #fff8ec 100%);
+  border-top: 1px solid #e5eee4;
+}
+.contact-section[hidden] { display: none; }
+.contact-inner {
+  width: min(100%, 1100px);
+  margin: 0 auto;
+}
+.contact-section .eyebrow {
+  color: #dc896b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+.contact-section h2 {
+  margin: 10px 0 18px;
+  color: #174f49;
+  font-size: clamp(23px, 2.4vw, 30px);
+  font-weight: 900;
+}
+.contact-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.contact-details a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #dce9df;
+  border-radius: 12px;
+  background: #fff;
+  color: #17665d;
+  font-weight: 700;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.contact-details a:hover {
+  border-color: #a9d5bd;
+  background: #eff9f1;
+}

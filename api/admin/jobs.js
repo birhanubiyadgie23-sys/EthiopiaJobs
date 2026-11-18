@@ -8,12 +8,8 @@ import { requireAdmin } from "../_lib/admin-auth.js";
 
 function requiredText(value, maxLength) {
   if (typeof value !== "string") return null;
-
   const text = value.trim();
-
-  if (!text || text.length > maxLength) return null;
-
-  return text;
+  return !text || text.length > maxLength ? null : text;
 }
 
 function optionalText(value, maxLength) {
@@ -27,13 +23,9 @@ function optionalText(value, maxLength) {
 
   const text = value.trim();
 
-  if (text.length > maxLength) {
-    return { value: null, valid: false };
-  }
-
   return {
     value: text || null,
-    valid: true
+    valid: text.length <= maxLength
   };
 }
 
@@ -89,9 +81,7 @@ function optionalDate(value) {
 function optionalUrl(value) {
   const result = optionalText(value, 2000);
 
-  if (!result.valid || !result.value) {
-    return result;
-  }
+  if (!result.valid || !result.value) return result;
 
   try {
     const url = new URL(result.value);
@@ -117,26 +107,15 @@ function getValue(body, current, field) {
 function parseJobId(value) {
   const id = String(value ?? "");
 
-  if (!/^[1-9]\d{0,18}$/.test(id)) {
-    return null;
-  }
+  if (!/^[1-9]\d{0,18}$/.test(id)) return null;
 
   try {
-    if (BigInt(id) > 9223372036854775807n) {
-      return null;
-    }
+    if (BigInt(id) > 9223372036854775807n) return null;
   } catch {
     return null;
   }
 
   return id;
-}
-
-function validEmail(value) {
-  return (
-    !value ||
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-  );
 }
 
 // ==========================================
@@ -145,13 +124,11 @@ function validEmail(value) {
 
 function parseJobInput(body, current = null) {
   const titleAm = requiredText(
-    getValue(body, current, "title_am"),
-    250
+    getValue(body, current, "title_am"), 250
   );
 
   const organizationName = requiredText(
-    getValue(body, current, "organization_name"),
-    250
+    getValue(body, current, "organization_name"), 250
   );
 
   if (!titleAm || !organizationName) {
@@ -162,53 +139,18 @@ function parseJobInput(body, current = null) {
   }
 
   const fields = {
-    title_en: optionalText(
-      getValue(body, current, "title_en"), 250
-    ),
-
-    description_am: optionalText(
-      getValue(body, current, "description_am"), 20000
-    ),
-
-    description_en: optionalText(
-      getValue(body, current, "description_en"), 20000
-    ),
-
-    requirements_am: optionalText(
-      getValue(body, current, "requirements_am"), 15000
-    ),
-
-    requirements_en: optionalText(
-      getValue(body, current, "requirements_en"), 15000
-    ),
-
-    employment_type: optionalText(
-      getValue(body, current, "employment_type"), 100
-    ),
-
-    education_level: optionalText(
-      getValue(body, current, "education_level"), 150
-    ),
-
-    application_method_am: optionalText(
-      getValue(body, current, "application_method_am"), 5000
-    ),
-
-    application_method_en: optionalText(
-      getValue(body, current, "application_method_en"), 5000
-    ),
-
-    application_phone: optionalText(
-      getValue(body, current, "application_phone"), 80
-    ),
-
-    source_reference: optionalText(
-      getValue(body, current, "source_reference"), 2000
-    ),
-
-    application_email: optionalText(
-      getValue(body, current, "application_email"), 254
-    )
+    title_en: optionalText(getValue(body, current, "title_en"), 250),
+    description_am: optionalText(getValue(body, current, "description_am"), 20000),
+    description_en: optionalText(getValue(body, current, "description_en"), 20000),
+    requirements_am: optionalText(getValue(body, current, "requirements_am"), 15000),
+    requirements_en: optionalText(getValue(body, current, "requirements_en"), 15000),
+    employment_type: optionalText(getValue(body, current, "employment_type"), 100),
+    education_level: optionalText(getValue(body, current, "education_level"), 150),
+    application_method_am: optionalText(getValue(body, current, "application_method_am"), 5000),
+    application_method_en: optionalText(getValue(body, current, "application_method_en"), 5000),
+    application_phone: optionalText(getValue(body, current, "application_phone"), 80),
+    source_reference: optionalText(getValue(body, current, "source_reference"), 2000),
+    application_email: optionalText(getValue(body, current, "application_email"), 254)
   };
 
   for (const field of Object.values(fields)) {
@@ -220,11 +162,10 @@ function parseJobInput(body, current = null) {
     }
   }
 
-  if (!validEmail(fields.application_email.value)) {
-    return {
-      ok: false,
-      error: "Invalid application email"
-    };
+  const email = fields.application_email.value;
+
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { ok: false, error: "Invalid application email" };
   }
 
   const applicationUrl = optionalUrl(
@@ -232,10 +173,7 @@ function parseJobInput(body, current = null) {
   );
 
   if (!applicationUrl.valid) {
-    return {
-      ok: false,
-      error: "Invalid application URL"
-    };
+    return { ok: false, error: "Invalid application URL" };
   }
 
   const category = optionalId(
@@ -247,10 +185,7 @@ function parseJobInput(body, current = null) {
   );
 
   if (!category.valid || !location.valid) {
-    return {
-      ok: false,
-      error: "Invalid category or location"
-    };
+    return { ok: false, error: "Invalid category or location" };
   }
 
   const publishedDate = optionalDate(
@@ -268,19 +203,10 @@ function parseJobInput(body, current = null) {
     };
   }
 
-  const rawExperience = getValue(
-    body,
-    current,
-    "experience_years"
-  );
-
+  const rawExperience = getValue(body, current, "experience_years");
   let experienceYears = null;
 
-  if (
-    rawExperience !== undefined &&
-    rawExperience !== null &&
-    rawExperience !== ""
-  ) {
+  if (rawExperience !== undefined && rawExperience !== null && rawExperience !== "") {
     experienceYears = Number(rawExperience);
 
     if (
@@ -288,10 +214,7 @@ function parseJobInput(body, current = null) {
       experienceYears < 0 ||
       experienceYears > 80
     ) {
-      return {
-        ok: false,
-        error: "Invalid experience years"
-      };
+      return { ok: false, error: "Invalid experience years" };
     }
   }
 
@@ -315,7 +238,7 @@ function parseJobInput(body, current = null) {
       application_method_am: fields.application_method_am.value,
       application_method_en: fields.application_method_en.value,
       application_url: applicationUrl.value,
-      application_email: fields.application_email.value,
+      application_email: email,
       application_phone: fields.application_phone.value,
       source_reference: fields.source_reference.value
     }
@@ -323,26 +246,22 @@ function parseJobInput(body, current = null) {
 }
 
 // ==========================================
-// DATABASE REFERENCE VALIDATION
+// VALIDATE CATEGORY AND LOCATION
 // ==========================================
 
 async function validateReferences(data, current = null) {
   if (
     data.category_id !== null &&
-    (
-      !current ||
-      String(data.category_id) !== String(current.category_id)
-    )
+    (!current || String(data.category_id) !== String(current.category_id))
   ) {
-    const categories = await sql`
-      SELECT id
-      FROM categories
+    const rows = await sql`
+      SELECT id FROM categories
       WHERE id = ${data.category_id}
         AND is_active = true
       LIMIT 1
     `;
 
-    if (categories.length !== 1) {
+    if (rows.length !== 1) {
       return {
         ok: false,
         error: "Selected category does not exist or is inactive"
@@ -352,19 +271,15 @@ async function validateReferences(data, current = null) {
 
   if (
     data.location_id !== null &&
-    (
-      !current ||
-      String(data.location_id) !== String(current.location_id)
-    )
+    (!current || String(data.location_id) !== String(current.location_id))
   ) {
-    const locations = await sql`
-      SELECT id
-      FROM locations
+    const rows = await sql`
+      SELECT id FROM locations
       WHERE id = ${data.location_id}
       LIMIT 1
     `;
 
-    if (locations.length !== 1) {
+    if (rows.length !== 1) {
       return {
         ok: false,
         error: "Selected location does not exist"
@@ -376,7 +291,7 @@ async function validateReferences(data, current = null) {
 }
 
 // ==========================================
-// GET JOBS - ADMIN LIST
+// GET JOBS
 // ==========================================
 
 async function getJobs(req, res) {
@@ -384,12 +299,10 @@ async function getJobs(req, res) {
   const limitValue = Number(req.query?.limit ?? 20);
 
   const page = Number.isSafeInteger(pageValue) && pageValue > 0
-    ? pageValue
-    : 1;
+    ? pageValue : 1;
 
   const limit = Number.isSafeInteger(limitValue) && limitValue > 0
-    ? Math.min(limitValue, 100)
-    : 20;
+    ? Math.min(limitValue, 100) : 20;
 
   const offset = (page - 1) * limit;
 
@@ -421,31 +334,7 @@ async function getJobs(req, res) {
 
   if (rawStatus) {
     jobs = await sql`
-      SELECT
-        id,
-        title_am,
-        title_en,
-        organization_name,
-        description_am,
-        description_en,
-        requirements_am,
-        requirements_en,
-        category_id,
-        location_id,
-        employment_type,
-        education_level,
-        experience_years,
-        published_at,
-        deadline_at,
-        application_method_am,
-        application_method_en,
-        application_url,
-        application_email,
-        application_phone,
-        source_reference,
-        status,
-        created_at,
-        updated_at
+      SELECT *
       FROM jobs
       WHERE status = ${rawStatus}
       ORDER BY created_at DESC, id DESC
@@ -460,31 +349,7 @@ async function getJobs(req, res) {
     `;
   } else {
     jobs = await sql`
-      SELECT
-        id,
-        title_am,
-        title_en,
-        organization_name,
-        description_am,
-        description_en,
-        requirements_am,
-        requirements_en,
-        category_id,
-        location_id,
-        employment_type,
-        education_level,
-        experience_years,
-        published_at,
-        deadline_at,
-        application_method_am,
-        application_method_en,
-        application_url,
-        application_email,
-        application_phone,
-        source_reference,
-        status,
-        created_at,
-        updated_at
+      SELECT *
       FROM jobs
       ORDER BY created_at DESC, id DESC
       LIMIT ${limit}
@@ -512,16 +377,13 @@ async function getJobs(req, res) {
 }
 
 // ==========================================
-// CREATE JOB - POST
+// CREATE JOB
 // ==========================================
 
 async function createJob(req, res) {
   const body = req.body || {};
 
-  if (
-    typeof body !== "object" ||
-    Array.isArray(body)
-  ) {
+  if (typeof body !== "object" || Array.isArray(body)) {
     return res.status(400).json({
       ok: false,
       error: "Invalid request body"
@@ -538,7 +400,6 @@ async function createJob(req, res) {
   }
 
   const data = parsed.data;
-
   const references = await validateReferences(data);
 
   if (!references.ok) {
@@ -550,61 +411,29 @@ async function createJob(req, res) {
 
   const result = await sql`
     INSERT INTO jobs (
-      title_am,
-      title_en,
-      organization_name,
-      description_am,
-      description_en,
-      requirements_am,
-      requirements_en,
-      category_id,
-      location_id,
-      employment_type,
-      education_level,
-      experience_years,
-      published_at,
-      deadline_at,
-      application_method_am,
-      application_method_en,
-      application_url,
-      application_email,
-      application_phone,
-      source_reference,
-      status,
-      created_at,
-      updated_at
+      title_am, title_en, organization_name,
+      description_am, description_en,
+      requirements_am, requirements_en,
+      category_id, location_id,
+      employment_type, education_level, experience_years,
+      published_at, deadline_at,
+      application_method_am, application_method_en,
+      application_url, application_email, application_phone,
+      source_reference, status, created_at, updated_at
     )
     VALUES (
-      ${data.title_am},
-      ${data.title_en},
-      ${data.organization_name},
-      ${data.description_am},
-      ${data.description_en},
-      ${data.requirements_am},
-      ${data.requirements_en},
-      ${data.category_id},
-      ${data.location_id},
-      ${data.employment_type},
-      ${data.education_level},
-      ${data.experience_years},
-      ${data.published_at},
-      ${data.deadline_at},
-      ${data.application_method_am},
-      ${data.application_method_en},
-      ${data.application_url},
-      ${data.application_email},
-      ${data.application_phone},
-      ${data.source_reference},
-      'draft',
-      NOW(),
-      NOW()
+      ${data.title_am}, ${data.title_en}, ${data.organization_name},
+      ${data.description_am}, ${data.description_en},
+      ${data.requirements_am}, ${data.requirements_en},
+      ${data.category_id}, ${data.location_id},
+      ${data.employment_type}, ${data.education_level},
+      ${data.experience_years}, ${data.published_at},
+      ${data.deadline_at}, ${data.application_method_am},
+      ${data.application_method_en}, ${data.application_url},
+      ${data.application_email}, ${data.application_phone},
+      ${data.source_reference}, 'draft', NOW(), NOW()
     )
-    RETURNING
-      id,
-      title_am,
-      organization_name,
-      status,
-      created_at
+    RETURNING id, title_am, organization_name, status, created_at
   `;
 
   return res.status(201).json({
@@ -615,7 +444,81 @@ async function createJob(req, res) {
 }
 
 // ==========================================
-// UPDATE JOB STATUS - PATCH
+// EDIT JOB
+// ==========================================
+
+async function editJob(id, body, res) {
+  const currentRows = await sql`
+    SELECT * FROM jobs
+    WHERE id = ${id}
+    LIMIT 1
+  `;
+
+  if (currentRows.length !== 1) {
+    return res.status(404).json({
+      ok: false,
+      error: "Job not found"
+    });
+  }
+
+  const current = currentRows[0];
+  const parsed = parseJobInput(body, current);
+
+  if (!parsed.ok) {
+    return res.status(400).json({
+      ok: false,
+      error: parsed.error
+    });
+  }
+
+  const data = parsed.data;
+  const references = await validateReferences(data, current);
+
+  if (!references.ok) {
+    return res.status(400).json({
+      ok: false,
+      error: references.error
+    });
+  }
+
+  const result = await sql`
+    UPDATE jobs
+    SET
+      title_am = ${data.title_am},
+      title_en = ${data.title_en},
+      organization_name = ${data.organization_name},
+      description_am = ${data.description_am},
+      description_en = ${data.description_en},
+      requirements_am = ${data.requirements_am},
+      requirements_en = ${data.requirements_en},
+      category_id = ${data.category_id},
+      location_id = ${data.location_id},
+      employment_type = ${data.employment_type},
+      education_level = ${data.education_level},
+      experience_years = ${data.experience_years},
+      published_at = ${data.published_at},
+      deadline_at = ${data.deadline_at},
+      application_method_am = ${data.application_method_am},
+      application_method_en = ${data.application_method_en},
+      application_url = ${data.application_url},
+      application_email = ${data.application_email},
+      application_phone = ${data.application_phone},
+      source_reference = ${data.source_reference},
+      updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING id, title_am, title_en, organization_name,
+      status, published_at, updated_at
+  `;
+
+  return res.status(200).json({
+    ok: true,
+    message: "Job updated successfully",
+    data: result[0]
+  });
+}
+
+// ==========================================
+// CHANGE JOB STATUS
 // ==========================================
 
 async function updateJobStatus(id, body, res) {
@@ -630,14 +533,9 @@ async function updateJobStatus(id, body, res) {
 
   const currentRows = await sql`
     SELECT
-      id,
-      title_am,
-      organization_name,
-      application_method_am,
-      application_method_en,
-      application_url,
-      application_email,
-      application_phone
+      id, title_am, organization_name,
+      application_method_am, application_method_en,
+      application_url, application_email, application_phone
     FROM jobs
     WHERE id = ${id}
     LIMIT 1
@@ -687,13 +585,8 @@ async function updateJobStatus(id, body, res) {
       END,
       updated_at = NOW()
     WHERE id = ${id}
-    RETURNING
-      id,
-      title_am,
-      organization_name,
-      status,
-      published_at,
-      updated_at
+    RETURNING id, title_am, organization_name,
+      status, published_at, updated_at
   `;
 
   return res.status(200).json({
@@ -706,85 +599,68 @@ async function updateJobStatus(id, body, res) {
 }
 
 // ==========================================
-// EDIT JOB - PATCH
+// DELETE JOB - DRAFT ONLY
 // ==========================================
 
-async function editJob(id, body, res) {
-  const currentRows = await sql`
-    SELECT *
-    FROM jobs
-    WHERE id = ${id}
-    LIMIT 1
-  `;
+async function deleteJob(id, res) {
+  // Execute child and parent deletion in one transaction.
+  // Published jobs are protected by checking their status.
 
-  if (currentRows.length !== 1) {
+  const [existingRows, deletedSources, deletedJobs] =
+    await sql.transaction([
+      sql`
+        SELECT id, status
+        FROM jobs
+        WHERE id = ${id}
+        FOR UPDATE
+      `,
+
+      sql`
+        DELETE FROM job_sources
+        WHERE job_id = ${id}
+          AND EXISTS (
+            SELECT 1
+            FROM jobs
+            WHERE id = ${id}
+              AND status = 'draft'
+          )
+        RETURNING id
+      `,
+
+      sql`
+        DELETE FROM jobs
+        WHERE id = ${id}
+          AND status = 'draft'
+        RETURNING id, title_am, organization_name, status
+      `
+    ]);
+
+  if (existingRows.length === 0) {
     return res.status(404).json({
       ok: false,
       error: "Job not found"
     });
   }
 
-  const current = currentRows[0];
-
-  const parsed = parseJobInput(body, current);
-
-  if (!parsed.ok) {
-    return res.status(400).json({
+  if (existingRows[0].status !== "draft") {
+    return res.status(409).json({
       ok: false,
-      error: parsed.error
+      error: "Only draft jobs can be deleted. Move the job to draft first."
     });
   }
 
-  const data = parsed.data;
-
-  const references = await validateReferences(data, current);
-
-  if (!references.ok) {
-    return res.status(400).json({
+  if (deletedJobs.length !== 1) {
+    return res.status(409).json({
       ok: false,
-      error: references.error
+      error: "Job could not be deleted"
     });
   }
-
-  const result = await sql`
-    UPDATE jobs
-    SET
-      title_am = ${data.title_am},
-      title_en = ${data.title_en},
-      organization_name = ${data.organization_name},
-      description_am = ${data.description_am},
-      description_en = ${data.description_en},
-      requirements_am = ${data.requirements_am},
-      requirements_en = ${data.requirements_en},
-      category_id = ${data.category_id},
-      location_id = ${data.location_id},
-      employment_type = ${data.employment_type},
-      education_level = ${data.education_level},
-      experience_years = ${data.experience_years},
-      published_at = ${data.published_at},
-      deadline_at = ${data.deadline_at},
-      application_method_am = ${data.application_method_am},
-      application_method_en = ${data.application_method_en},
-      application_url = ${data.application_url},
-      application_email = ${data.application_email},
-      application_phone = ${data.application_phone},
-      source_reference = ${data.source_reference},
-      updated_at = NOW()
-    WHERE id = ${id}
-    RETURNING
-      id,
-      title_am,
-      title_en,
-      organization_name,
-      status,
-      published_at,
-      updated_at
-  `;
 
   return res.status(200).json({
     ok: true,
-    message: "Job updated successfully",
-    data: result[0]
+    message: "Draft job deleted successfully",
+    data: deletedJobs[0],
+    deletedSourceRecords: deletedSources.length
   });
 }
 
@@ -795,7 +671,7 @@ async function editJob(id, body, res) {
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
-  const allowedMethods = ["GET", "POST", "PATCH"];
+  const allowedMethods = ["GET", "POST", "PATCH", "DELETE"];
 
   if (!allowedMethods.includes(req.method)) {
     res.setHeader("Allow", allowedMethods.join(", "));
@@ -811,41 +687,37 @@ export default async function handler(req, res) {
 
     if (!admin) return;
 
-    // GET: List all admin jobs
     if (req.method === "GET") {
       return await getJobs(req, res);
     }
 
+    if (req.method === "POST") {
+      return await createJob(req, res);
+    }
+
     const body = req.body || {};
 
-    if (
-      typeof body !== "object" ||
-      Array.isArray(body)
-    ) {
+    if (typeof body !== "object" || Array.isArray(body)) {
       return res.status(400).json({
         ok: false,
         error: "Invalid request body"
       });
     }
 
-    // POST: Create a new draft job
-    if (req.method === "POST") {
-      return await createJob(req, res);
+    const id = parseJobId(req.query?.id ?? body.id);
+
+    if (!id) {
+      return res.status(400).json({
+        ok: false,
+        error: "A valid job ID is required"
+      });
     }
 
-    // PATCH: Update an existing job
+    if (req.method === "DELETE") {
+      return await deleteJob(id, res);
+    }
+
     if (req.method === "PATCH") {
-      const id = parseJobId(
-        req.query?.id ?? body.id
-      );
-
-      if (!id) {
-        return res.status(400).json({
-          ok: false,
-          error: "A valid job ID is required"
-        });
-      }
-
       if (body.action === "status") {
         return await updateJobStatus(id, body, res);
       }
@@ -862,11 +734,9 @@ export default async function handler(req, res) {
 
       return await editJob(id, body, res);
     }
+
   } catch (error) {
-    console.error(
-      "Admin jobs API error:",
-      error?.message || error
-    );
+    console.error("Admin jobs API error:", error?.message || error);
 
     return res.status(500).json({
       ok: false,

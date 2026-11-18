@@ -7,8 +7,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Admin Dashboard | Ethiopia Jobs</title>
 
- 
-<style>
+  <style>
     * {
       box-sizing: border-box;
     }
@@ -181,6 +180,11 @@
       font-weight: bold;
     }
 
+    .secondary-button {
+      background: #e2e8f0;
+      color: #123b66;
+    }
+
     #formMessage {
       margin-top: 15px;
       font-size: 14px;
@@ -266,8 +270,6 @@
       color: #dc2626;
     }
 
-    /* Job status buttons */
-
     .job-action-button {
       padding: 8px 12px;
       border-radius: 6px;
@@ -283,15 +285,23 @@
     .job-action-button.draft {
       background: #d97706;
     }
-.job-action-button.edit {
-  background: #2563eb;
-}
 
-.action-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
+    .job-action-button.edit {
+      background: #2563eb;
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
     footer {
       text-align: center;
       padding: 25px;
@@ -321,8 +331,7 @@
         grid-column: auto;
       }
     }
-</style>
-
+  </style>
 </head>
 
 <body>
@@ -372,10 +381,8 @@
     </div>
   </section>
 
-  <!-- ADD JOB FORM -->
-
   <section class="panel">
-    <h3>አዲስ የስራ ማስታወቂያ ጨምር</h3>
+    <h3 id="jobFormTitle">አዲስ የስራ ማስታወቂያ ጨምር</h3>
 
     <p class="help">
       የስራ ማስታወቂያው መጀመሪያ Draft ሆኖ ይቀመጣል።
@@ -388,34 +395,20 @@
 
         <div class="field">
           <label for="title_am">የስራ ርዕስ (አማርኛ) *</label>
-          <input
-            id="title_am"
-            name="title_am"
-            type="text"
-            maxlength="250"
-            required
-          >
+          <input id="title_am" name="title_am"
+            type="text" maxlength="250" required>
         </div>
 
         <div class="field">
           <label for="title_en">Job Title (English)</label>
-          <input
-            id="title_en"
-            name="title_en"
-            type="text"
-            maxlength="250"
-          >
+          <input id="title_en" name="title_en"
+            type="text" maxlength="250">
         </div>
 
         <div class="field full">
           <label for="organization_name">የድርጅቱ ስም *</label>
-          <input
-            id="organization_name"
-            name="organization_name"
-            type="text"
-            maxlength="250"
-            required
-          >
+          <input id="organization_name" name="organization_name"
+            type="text" maxlength="250" required>
         </div>
 
         <div class="field">
@@ -434,161 +427,109 @@
 
         <div class="field">
           <label for="employment_type">የቅጥር አይነት</label>
-          <input
-            id="employment_type"
-            name="employment_type"
-            type="text"
-            maxlength="100"
-            placeholder="Full-time, Contract..."
-          >
+          <input id="employment_type" name="employment_type"
+            type="text" maxlength="100"
+            placeholder="Full-time, Contract...">
         </div>
 
         <div class="field">
           <label for="education_level">የትምህርት ደረጃ</label>
-          <input
-            id="education_level"
-            name="education_level"
-            type="text"
-            maxlength="150"
-            placeholder="Degree, Diploma..."
-          >
+          <input id="education_level" name="education_level"
+            type="text" maxlength="150"
+            placeholder="Degree, Diploma...">
         </div>
 
         <div class="field">
           <label for="experience_years">የስራ ልምድ (ዓመት)</label>
-          <input
-            id="experience_years"
-            name="experience_years"
-            type="number"
-            min="0"
-            max="80"
-            step="0.5"
-          >
+          <input id="experience_years" name="experience_years"
+            type="number" min="0" max="80" step="0.5">
         </div>
 
         <div class="field">
           <label for="deadline_at">የማመልከቻ መጨረሻ ቀን</label>
-          <input
-            id="deadline_at"
-            name="deadline_at"
-            type="date"
-          >
+          <input id="deadline_at" name="deadline_at" type="date">
         </div>
 
         <div class="field full">
           <label for="description_am">የስራው መግለጫ (አማርኛ)</label>
-          <textarea
-            id="description_am"
-            name="description_am"
-            maxlength="20000"
-          ></textarea>
+          <textarea id="description_am" name="description_am"
+            maxlength="20000"></textarea>
         </div>
 
         <div class="field full">
           <label for="description_en">Job Description (English)</label>
-          <textarea
-            id="description_en"
-            name="description_en"
-            maxlength="20000"
-          ></textarea>
+          <textarea id="description_en" name="description_en"
+            maxlength="20000"></textarea>
         </div>
 
         <div class="field full">
           <label for="requirements_am">መስፈርቶች (አማርኛ)</label>
-          <textarea
-            id="requirements_am"
-            name="requirements_am"
-            maxlength="15000"
-          ></textarea>
+          <textarea id="requirements_am" name="requirements_am"
+            maxlength="15000"></textarea>
         </div>
 
         <div class="field full">
           <label for="requirements_en">Requirements (English)</label>
-          <textarea
-            id="requirements_en"
-            name="requirements_en"
-            maxlength="15000"
-          ></textarea>
+          <textarea id="requirements_en" name="requirements_en"
+            maxlength="15000"></textarea>
         </div>
 
         <div class="field full">
           <label for="application_method_am">የማመልከቻ መንገድ (አማርኛ)</label>
-          <textarea
-            id="application_method_am"
-            name="application_method_am"
-            maxlength="5000"
-          ></textarea>
+          <textarea id="application_method_am"
+            name="application_method_am" maxlength="5000"></textarea>
         </div>
 
         <div class="field full">
           <label for="application_method_en">Application Method (English)</label>
-          <textarea
-            id="application_method_en"
-            name="application_method_en"
-            maxlength="5000"
-          ></textarea>
+          <textarea id="application_method_en"
+            name="application_method_en" maxlength="5000"></textarea>
         </div>
 
         <div class="field">
           <label for="application_url">የማመልከቻ ድረገጽ</label>
-          <input
-            id="application_url"
-            name="application_url"
-            type="url"
-            maxlength="2000"
-            placeholder="https://..."
-          >
+          <input id="application_url" name="application_url"
+            type="url" maxlength="2000" placeholder="https://...">
         </div>
 
         <div class="field">
           <label for="application_email">የማመልከቻ Email</label>
-          <input
-            id="application_email"
-            name="application_email"
-            type="email"
-            maxlength="254"
-          >
+          <input id="application_email" name="application_email"
+            type="email" maxlength="254">
         </div>
 
         <div class="field">
           <label for="application_phone">ስልክ ቁጥር</label>
-          <input
-            id="application_phone"
-            name="application_phone"
-            type="text"
-            maxlength="80"
-          >
+          <input id="application_phone" name="application_phone"
+            type="text" maxlength="80">
         </div>
 
         <div class="field">
           <label for="source_reference">የመረጃ ምንጭ / Reference</label>
-          <input
-            id="source_reference"
-            name="source_reference"
-            type="text"
-            maxlength="2000"
-            placeholder="የጋዜጣ ስም፣ ሊንክ..."
-          >
+          <input id="source_reference" name="source_reference"
+            type="text" maxlength="2000"
+            placeholder="የጋዜጣ ስም፣ ሊንክ...">
         </div>
 
       </div>
 
-      <div style="margin-top:22px">
-        <button
-          type="submit"
-          id="saveJobButton"
-          class="primary-button"
-        >
+      <div class="form-actions" style="margin-top:22px">
+        <button type="submit" id="saveJobButton"
+          class="primary-button">
           ስራውን Draft አድርገህ አስቀምጥ
+        </button>
+
+        <button type="button" id="cancelEditButton"
+          class="secondary-button" hidden>
+          ማስተካከያውን ሰርዝ
         </button>
       </div>
 
-      <div id="formMessage" role="status" aria-live="polite"></div>
+      <div id="formMessage" role="status"
+        aria-live="polite"></div>
 
     </form>
   </section>
-
-  <!-- RECENT JOBS -->
 
   <section class="panel">
     <h3>የቅርብ ጊዜ የስራ ማስታወቂያዎች</h3>
@@ -607,7 +548,7 @@
 
         <tbody id="jobsTable">
           <tr>
-            <td colspan="4" class="empty">
+            <td colspan="5" class="empty">
               መረጃ በማምጣት ላይ...
             </td>
           </tr>
@@ -638,9 +579,14 @@
 "use strict";
 
 const $ = (id) => document.getElementById(id);
+
 let adminJobs = [];
 let editingJobId = null;
-  
+
+// ==========================================
+// API HELPER
+// ==========================================
+
 async function requestJSON(url, options = {}) {
   const response = await fetch(url, {
     credentials: "same-origin",
@@ -648,7 +594,13 @@ async function requestJSON(url, options = {}) {
     ...options
   });
 
-  const result = await response.json();
+  let result;
+
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error("Server returned an invalid response");
+  }
 
   if (!response.ok) {
     throw new Error(result.error || "Request failed");
@@ -656,6 +608,10 @@ async function requestJSON(url, options = {}) {
 
   return result;
 }
+
+// ==========================================
+// GENERAL HELPERS
+// ==========================================
 
 function setStat(id, value) {
   $(id).textContent = String(value);
@@ -694,22 +650,34 @@ function addOption(select, value, label) {
   select.appendChild(option);
 }
 
+// ==========================================
+// CATEGORY AND LOCATION LISTS
+// ==========================================
+
 function renderCategories(categories) {
   const select = $("category_id");
-  select.replaceChildren();
+  const previousValue = select.value;
 
+  select.replaceChildren();
   addOption(select, "", "ዘርፍ ይምረጡ");
 
   categories.forEach((item) => {
     const label = item.name_am || item.name_en || "ያልተሰየመ ዘርፍ";
     addOption(select, item.id, label);
   });
+
+  if ([...select.options].some(
+    (option) => option.value === previousValue
+  )) {
+    select.value = previousValue;
+  }
 }
 
 function renderLocations(locations) {
   const select = $("location_id");
-  select.replaceChildren();
+  const previousValue = select.value;
 
+  select.replaceChildren();
   addOption(select, "", "አካባቢ ይምረጡ");
 
   locations.forEach((item) => {
@@ -723,7 +691,17 @@ function renderLocations(locations) {
       label || "አካባቢ #" + item.id
     );
   });
+
+  if ([...select.options].some(
+    (option) => option.value === previousValue
+  )) {
+    select.value = previousValue;
+  }
 }
+
+// ==========================================
+// RENDER JOB TABLE
+// ==========================================
 
 function renderJobs(jobs) {
   const tbody = $("jobsTable");
@@ -772,9 +750,7 @@ function renderJobs(jobs) {
 
     buttons.className = "action-buttons";
 
-    // Edit button
     const editButton = document.createElement("button");
-
     editButton.type = "button";
     editButton.textContent = "Edit";
     editButton.className = "job-action-button edit";
@@ -782,7 +758,6 @@ function renderJobs(jobs) {
 
     buttons.appendChild(editButton);
 
-    // Publish / Draft button
     const statusButton = document.createElement("button");
 
     statusButton.type = "button";
@@ -816,6 +791,11 @@ function renderJobs(jobs) {
     tbody.appendChild(row);
   });
 }
+
+// ==========================================
+// ADMIN SESSION
+// ==========================================
+
 async function checkSession() {
   try {
     const result = await requestJSON("/api/admin/me");
@@ -833,6 +813,10 @@ async function checkSession() {
     return false;
   }
 }
+
+// ==========================================
+// LOAD DASHBOARD DATA
+// ==========================================
 
 async function loadDashboard() {
   showMessage("");
@@ -864,7 +848,9 @@ async function loadDashboard() {
     const newspapers = Array.isArray(newspapersResult.data)
       ? newspapersResult.data : [];
 
-    const totalJobs = Number(jobsResult.pagination?.total || 0);
+    const totalJobs = Number(
+      jobsResult.pagination?.total || 0
+    );
 
     const publishedTotal = Number(
       publishedJobsResult.pagination?.total || 0
@@ -877,7 +863,9 @@ async function loadDashboard() {
 
     setStat(
       "activeNewspapers",
-      newspapers.filter((item) => item.is_active === true).length
+      newspapers.filter(
+        (item) => item.is_active === true
+      ).length
     );
 
     renderCategories(categories);
@@ -893,12 +881,119 @@ async function loadDashboard() {
   }
 }
 
+// ==========================================
+// FORM MODE AND RESET
+// ==========================================
+
+function setFormMode(isEditing) {
+  const title = $("jobFormTitle");
+  const button = $("saveJobButton");
+  const cancelButton = $("cancelEditButton");
+
+  if (isEditing) {
+    title.textContent = "የስራ ማስታወቂያ አስተካክል";
+    button.textContent = "ለውጦቹን አስቀምጥ";
+    cancelButton.hidden = false;
+  } else {
+    title.textContent = "አዲስ የስራ ማስታወቂያ ጨምር";
+    button.textContent = "ስራውን Draft አድርገህ አስቀምጥ";
+    cancelButton.hidden = true;
+  }
+}
+
+function resetJobForm(clearMessage = true) {
+  $("jobForm").reset();
+  editingJobId = null;
+  setFormMode(false);
+
+  if (clearMessage) {
+    $("formMessage").textContent = "";
+    $("formMessage").className = "";
+  }
+}
+
+// ==========================================
+// EDIT JOB
+// ==========================================
+
+function startEditingJob(id) {
+  const job = adminJobs.find(
+    (item) => String(item.id) === String(id)
+  );
+
+  if (!job) {
+    showMessage(
+      "የተመረጠው ስራ አልተገኘም። መረጃዎችን አድስና እንደገና ሞክር።"
+    );
+    return;
+  }
+
+  const fields = [
+    "title_am",
+    "title_en",
+    "organization_name",
+    "category_id",
+    "location_id",
+    "employment_type",
+    "education_level",
+    "experience_years",
+    "deadline_at",
+    "description_am",
+    "description_en",
+    "requirements_am",
+    "requirements_en",
+    "application_method_am",
+    "application_method_en",
+    "application_url",
+    "application_email",
+    "application_phone",
+    "source_reference"
+  ];
+
+  fields.forEach((name) => {
+    const input = $(name);
+    if (!input) return;
+
+    const value = job[name];
+
+    if (input.type === "date") {
+      input.value = value
+        ? String(value).slice(0, 10)
+        : "";
+    } else {
+      input.value =
+        value === null || value === undefined
+          ? ""
+          : String(value);
+    }
+  });
+
+  editingJobId = String(job.id);
+  setFormMode(true);
+
+  $("formMessage").textContent =
+    `የስራ ቁጥር ${job.id} እያስተካከልክ ነው።`;
+
+  $("formMessage").className = "";
+
+  $("jobForm").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+// ==========================================
+// CREATE OR UPDATE JOB
+// ==========================================
+
 async function createJob(event) {
   event.preventDefault();
 
   const form = $("jobForm");
   const button = $("saveJobButton");
   const message = $("formMessage");
+
+  const isEditing = editingJobId !== null;
 
   message.textContent = "";
   message.className = "";
@@ -908,12 +1003,18 @@ async function createJob(event) {
   const formData = new FormData(form);
   const payload = Object.fromEntries(formData.entries());
 
+  const url = isEditing
+    ? `/api/admin/jobs?id=${encodeURIComponent(editingJobId)}`
+    : "/api/admin/jobs";
+
+  const method = isEditing ? "PATCH" : "POST";
+
   button.disabled = true;
   button.textContent = "በማስቀመጥ ላይ...";
 
   try {
-    const result = await requestJSON("/api/admin/jobs", {
-      method: "POST",
+    const result = await requestJSON(url, {
+      method,
       headers: {
         "Content-Type": "application/json"
       },
@@ -921,13 +1022,16 @@ async function createJob(event) {
     });
 
     if (!result.ok) {
-      throw new Error("ስራውን ማስቀመጥ አልተቻለም።");
+      throw new Error(
+        result.error || "ስራውን ማስቀመጥ አልተቻለም።"
+      );
     }
 
-    form.reset();
+    resetJobForm(false);
 
-    message.textContent =
-      "ስራው በተሳካ ሁኔታ Draft ሆኖ ተቀምጧል።";
+    message.textContent = isEditing
+      ? "የስራ መረጃው በተሳካ ሁኔታ ተስተካክሏል።"
+      : "ስራው በተሳካ ሁኔታ Draft ሆኖ ተቀምጧል።";
 
     message.className = "success";
 
@@ -941,17 +1045,26 @@ async function createJob(event) {
 
   } finally {
     button.disabled = false;
-    button.textContent = "ስራውን Draft አድርገህ አስቀምጥ";
+    setFormMode(editingJobId !== null);
   }
 }
-async function changeJobStatus(id, nextStatus) {
+
+// ==========================================
+// CHANGE JOB STATUS
+// ==========================================
+
+async function changeJobStatus(id, nextStatus, button = null) {
   const actionText = nextStatus === "published"
     ? "Publish"
     : "Draft";
 
-  if (!window.confirm(`ይህን ስራ ${actionText} ማድረግ ትፈልጋለህ?`)) {
+  if (!window.confirm(
+    `ይህን ስራ ${actionText} ማድረግ ትፈልጋለህ?`
+  )) {
     return;
   }
+
+  if (button) button.disabled = true;
 
   try {
     await requestJSON(
@@ -974,8 +1087,15 @@ async function changeJobStatus(id, nextStatus) {
     showMessage(
       error.message || "የስራውን ሁኔታ መቀየር አልተቻለም።"
     );
+
+    if (button) button.disabled = false;
   }
 }
+
+// ==========================================
+// LOGOUT
+// ==========================================
+
 async function logout() {
   $("logoutButton").disabled = true;
 
@@ -987,10 +1107,17 @@ async function logout() {
     window.location.replace("/admin.html");
 
   } catch {
-    showMessage("Logout አልተሳካም። እንደገና ይሞክሩ።");
+    showMessage(
+      "Logout አልተሳካም። እንደገና ይሞክሩ።"
+    );
+
     $("logoutButton").disabled = false;
   }
 }
+
+// ==========================================
+// START DASHBOARD
+// ==========================================
 
 async function startDashboard() {
   const authenticated = await checkSession();
@@ -1000,22 +1127,43 @@ async function startDashboard() {
   await loadDashboard();
 }
 
+// ==========================================
+// EVENT LISTENERS
+// ==========================================
+
 $("jobForm").addEventListener("submit", createJob);
+
+$("cancelEditButton").addEventListener("click", () => {
+  resetJobForm();
+});
 
 $("logoutButton").addEventListener("click", logout);
 
 $("refreshButton").addEventListener("click", loadDashboard);
 
 $("jobsTable").addEventListener("click", (event) => {
-  const button = event.target.closest("button[data-job-id]");
+  const editButton = event.target.closest(
+    "button[data-edit-job-id]"
+  );
 
-  if (!button || button.disabled) return;
+  if (editButton) {
+    startEditingJob(editButton.dataset.editJobId);
+    return;
+  }
+
+  const statusButton = event.target.closest(
+    "button[data-job-id]"
+  );
+
+  if (!statusButton || statusButton.disabled) return;
 
   changeJobStatus(
-    button.dataset.jobId,
-    button.dataset.nextStatus
+    statusButton.dataset.jobId,
+    statusButton.dataset.nextStatus,
+    statusButton
   );
 });
+
 startDashboard();
 </script>
 

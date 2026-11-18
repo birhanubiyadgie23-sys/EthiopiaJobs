@@ -37,6 +37,7 @@ export default async function handler(req, res) {
          j.application_url,
          j.application_email,
          j.application_phone,
+         j.source_reference,
          c.name_am AS category_am,
          c.name_en AS category_en,
          l.city_am,

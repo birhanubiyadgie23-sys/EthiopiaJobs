@@ -82,9 +82,14 @@ let currentPage = 1;
 let totalPages = 1;
 let totalJobs = 0;
 let jobs = [];
-let categories = [];
 let loadingFailed = false;
 let requestNumber = 0;
+
+let categories = [];
+let locations = [];
+
+let jobSuggestionTimer = null;
+let jobSuggestionRequest = 0;
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -101,7 +106,9 @@ function escapeHtml(value) {
 function formatDate(value) {
   if (!value) return "";
 
-  const dateValue = new Date(`${String(value).slice(0, 10)}T00:00:00`);
+  const dateValue = new Date(
+    `${String(value).slice(0, 10)}T00:00:00`
+  );
 
   if (Number.isNaN(dateValue.getTime())) return "";
 
@@ -140,75 +147,13 @@ function updatePagination() {
     `${translations[language].page} ${currentPage} / ${totalPages}`;
 }
 
-function renderCategories() {
-  const select = $("#category-search");
-  if (!select) return;
-
-  const selectedValue = select.value;
-
-  select.innerHTML = `
-    <option value="">
-      ${escapeHtml(translations[language].allCategories)}
-    </option>
-    ${categories.map((category) => {
-      const name = language === "am"
-        ? (category.name_am || category.name_en)
-        : (category.name_en || category.name_am);
-
-      return `
-        <option value="${escapeHtml(category.id)}">
-          ${escapeHtml(name)}
-        </option>
-      `;
-    }).join("")}
-  `;
-
-  if (
-    selectedValue &&
-    categories.some((category) => String(category.id) === selectedValue)
-  ) {
-    select.value = selectedValue;
-  }
-}
-
-async function loadCategories() {
-  const select = $("#category-search");
-  if (!select) return;
-
-  try {
-    const response = await fetch("/api/categories", {
-      headers: { Accept: "application/json" },
-      cache: "no-store"
-    });
-
-    const data = await response.json();
-
-    if (
-      !response.ok ||
-      data.ok !== true ||
-      !Array.isArray(data.data)
-    ) {
-      throw new Error("The categories API returned an invalid response.");
-    }
-
-    categories = data.data;
-    renderCategories();
-
-  } catch (error) {
-    console.error("Unable to load categories:", error);
-  }
-}
-
 function renderJobs() {
   const list = $("#jobs-list");
   if (!list) return;
 
   if (!jobs.length) {
-    list.innerHTML = `
-      <div class="jobs-empty">
-        ${escapeHtml(translations[language].noJobs)}
-      </div>
-    `;
+    list.innerHTML =
+      `<div class="jobs-empty">${escapeHtml(translations[language].noJobs)}</div>`;
     return;
   }
 
@@ -248,12 +193,220 @@ function renderJobs() {
   }).join("");
 }
 
+// =========================================
+// CATEGORY DROPDOWN
+// =========================================
+
+function renderCategories() {
+  const select = $("#category-search");
+  if (!select) return;
+
+  const selectedValue = select.value;
+  select.replaceChildren();
+
+  const allOption = document.createElement("option");
+  allOption.value = "";
+  allOption.textContent = translations[language].allCategories;
+
+  select.appendChild(allOption);
+
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+
+    option.value = String(category.id);
+
+    option.textContent = language === "am"
+      ? (category.name_am || category.name_en || "")
+      : (category.name_en || category.name_am || "");
+
+    select.appendChild(option);
+  });
+
+  if (
+    [...select.options].some(
+      (option) => option.value === selectedValue
+    )
+  ) {
+    select.value = selectedValue;
+  }
+}
+
+async function loadCategories() {
+  try {
+    const response = await fetch("/api/categories", {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    });
+
+    const result = await response.json();
+
+    if (
+      !response.ok ||
+      result.ok !== true ||
+      !Array.isArray(result.data)
+    ) {
+      throw new Error("The categories API returned an invalid response.");
+    }
+
+    categories = result.data;
+    renderCategories();
+
+  } catch (error) {
+    console.error("Unable to load categories:", error);
+  }
+}
+
+// =========================================
+// LOCATION AUTOCOMPLETE
+// =========================================
+
+function renderLocationSuggestions() {
+  const datalist = $("#location-suggestions");
+  if (!datalist) return;
+
+  const values = new Set();
+
+  locations.forEach((location) => {
+    [
+      location.city_am,
+      location.city_en,
+      location.region_am,
+      location.region_en
+    ].forEach((value) => {
+      const cleanValue = String(value || "").trim();
+
+      if (cleanValue) {
+        values.add(cleanValue);
+      }
+    });
+  });
+
+  datalist.replaceChildren();
+
+  [...values]
+    .sort((a, b) => a.localeCompare(b))
+    .forEach((value) => {
+      const option = document.createElement("option");
+      option.value = value;
+      datalist.appendChild(option);
+    });
+}
+
+async function loadLocations() {
+  try {
+    const response = await fetch("/api/locations", {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    });
+
+    const result = await response.json();
+
+    if (
+      !response.ok ||
+      result.ok !== true ||
+      !Array.isArray(result.data)
+    ) {
+      throw new Error("The locations API returned an invalid response.");
+    }
+
+    locations = result.data;
+    renderLocationSuggestions();
+
+  } catch (error) {
+    console.error("Unable to load locations:", error);
+  }
+}
+
+// =========================================
+// JOB TITLE / ORGANIZATION AUTOCOMPLETE
+// =========================================
+
+function renderJobSuggestions(suggestions) {
+  const datalist = $("#job-suggestions");
+  if (!datalist) return;
+
+  const values = new Set();
+
+  suggestions.forEach((item) => {
+    const value = String(item?.value || "").trim();
+
+    if (value) {
+      values.add(value);
+    }
+  });
+
+  datalist.replaceChildren();
+
+  values.forEach((value) => {
+    const option = document.createElement("option");
+    option.value = value;
+    datalist.appendChild(option);
+  });
+}
+
+async function loadJobSuggestions(query = "") {
+  const thisRequest = ++jobSuggestionRequest;
+
+  const params = new URLSearchParams({
+    suggestions: "1"
+  });
+
+  if (query.trim()) {
+    params.set("q", query.trim());
+  }
+
+  try {
+    const response = await fetch(
+      `/api/jobs?${params.toString()}`,
+      {
+        headers: { Accept: "application/json" },
+        cache: "no-store"
+      }
+    );
+
+    const result = await response.json();
+
+    if (
+      !response.ok ||
+      result.ok !== true ||
+      !Array.isArray(result.data)
+    ) {
+      throw new Error("The job suggestions API returned an invalid response.");
+    }
+
+    // Ignore old requests that finish after a newer request.
+    if (thisRequest !== jobSuggestionRequest) {
+      return;
+    }
+
+    renderJobSuggestions(result.data);
+
+  } catch (error) {
+    if (thisRequest === jobSuggestionRequest) {
+      console.warn("Unable to load job suggestions:", error);
+    }
+  }
+}
+
+function scheduleJobSuggestions(query) {
+  window.clearTimeout(jobSuggestionTimer);
+
+  jobSuggestionTimer = window.setTimeout(() => {
+    loadJobSuggestions(query);
+  }, 180);
+}
+
+// =========================================
+// LANGUAGE
+// =========================================
+
 function setLanguage(nextLanguage) {
   language = nextLanguage;
   document.documentElement.lang = language;
 
   document.querySelectorAll("[data-i18n]").forEach((element) => {
-    const translation = translations[language][element.dataset.i18n];
+    const translation =
+      translations[language][element.dataset.i18n];
 
     if (translation !== undefined) {
       element.innerHTML = translation;
@@ -281,8 +434,13 @@ function setLanguage(nextLanguage) {
   renderJobs();
 }
 
+// =========================================
+// JOB SEARCH
+// =========================================
+
 async function loadJobs() {
   const thisRequest = ++requestNumber;
+
   const status = $("#jobs-status");
 
   if (status) {
@@ -294,9 +452,14 @@ async function loadJobs() {
     limit: "10"
   });
 
-  const keyword = $("#job-search")?.value.trim() || "";
-  const location = $("#location-search")?.value.trim() || "";
-  const categoryId = $("#category-search")?.value || "";
+  const keyword =
+    $("#job-search")?.value.trim() || "";
+
+  const location =
+    $("#location-search")?.value.trim() || "";
+
+  const categoryId =
+    $("#category-search")?.value || "";
 
   if (keyword) {
     params.set("q", keyword);
@@ -311,10 +474,13 @@ async function loadJobs() {
   }
 
   try {
-    const response = await fetch(`/api/jobs?${params.toString()}`, {
-      headers: { Accept: "application/json" },
-      cache: "no-store"
-    });
+    const response = await fetch(
+      `/api/jobs?${params.toString()}`,
+      {
+        headers: { Accept: "application/json" },
+        cache: "no-store"
+      }
+    );
 
     const data = await response.json();
 
@@ -326,16 +492,24 @@ async function loadJobs() {
       throw new Error("The jobs API returned an invalid response.");
     }
 
-    if (thisRequest !== requestNumber) return;
+    if (thisRequest !== requestNumber) {
+      return;
+    }
 
     jobs = data.data;
     totalJobs = Number(data.pagination?.total || 0);
-    totalPages = Math.max(1, Number(data.pagination?.pages || 1));
+    totalPages = Math.max(
+      1,
+      Number(data.pagination?.pages || 1)
+    );
+
     currentPage = Math.min(currentPage, totalPages);
     loadingFailed = false;
 
   } catch (error) {
-    if (thisRequest !== requestNumber) return;
+    if (thisRequest !== requestNumber) {
+      return;
+    }
 
     console.error("Unable to load jobs:", error);
 
@@ -350,8 +524,20 @@ async function loadJobs() {
   renderJobs();
 }
 
+// =========================================
+// EVENT LISTENERS
+// =========================================
+
 $("#language-toggle")?.addEventListener("click", () => {
   setLanguage(language === "am" ? "en" : "am");
+});
+
+$("#job-search")?.addEventListener("focus", (event) => {
+  loadJobSuggestions(event.currentTarget.value.trim());
+});
+
+$("#job-search")?.addEventListener("input", (event) => {
+  scheduleJobSuggestions(event.currentTarget.value);
 });
 
 $("#search-form")?.addEventListener("submit", (event) => {
@@ -360,7 +546,9 @@ $("#search-form")?.addEventListener("submit", (event) => {
   currentPage = 1;
   loadJobs();
 
-  $("#latest")?.scrollIntoView({ behavior: "smooth" });
+  $("#latest")?.scrollIntoView({
+    behavior: "smooth"
+  });
 });
 
 $("#jobs-prev")?.addEventListener("click", () => {
@@ -377,6 +565,10 @@ $("#jobs-next")?.addEventListener("click", () => {
   }
 });
 
+// =========================================
+// INITIALIZE
+// =========================================
+
 const yearElement = $("#year");
 
 if (yearElement) {
@@ -385,4 +577,5 @@ if (yearElement) {
 
 setLanguage("am");
 loadCategories();
+loadLocations();
 loadJobs();

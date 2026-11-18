@@ -801,7 +801,7 @@ function renderJobs(jobs) {
 
 async function checkSession() {
   try {
-    const result = await requestJSON("/api/admin/me");
+    const result = await requestJSON("/api/admin/login");
 
     if (!result.authenticated || !result.admin) {
       window.location.replace("/admin.html");

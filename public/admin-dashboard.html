@@ -762,11 +762,13 @@ async function loadDashboard() {
   try {
     const [
       jobsResult,
+      publishedJobsResult,
       categoriesResult,
       locationsResult,
       newspapersResult
     ] = await Promise.all([
-      requestJSON("/api/jobs?page=1&limit=10"),
+      requestJSON("/api/admin/jobs?page=1&limit=100"),
+      requestJSON("/api/admin/jobs?page=1&limit=1&status=published"),
       requestJSON("/api/categories"),
       requestJSON("/api/locations"),
       requestJSON("/api/newspapers")
@@ -784,18 +786,14 @@ async function loadDashboard() {
     const newspapers = Array.isArray(newspapersResult.data)
       ? newspapersResult.data : [];
 
-    const totalJobs = jobsResult.pagination &&
-      Number.isFinite(Number(jobsResult.pagination.total))
-        ? Number(jobsResult.pagination.total)
-        : jobs.length;
+    const totalJobs = Number(jobsResult.pagination?.total || 0);
 
-    setStat("totalJobs", totalJobs);
-
-    setStat(
-      "publishedJobs",
-      jobs.filter((job) => job.status === "published").length
+    const publishedTotal = Number(
+      publishedJobsResult.pagination?.total || 0
     );
 
+    setStat("totalJobs", totalJobs);
+    setStat("publishedJobs", publishedTotal);
     setStat("totalCategories", categories.length);
     setStat("totalLocations", locations.length);
 
@@ -812,6 +810,7 @@ async function loadDashboard() {
     showMessage(
       "መረጃዎችን ማምጣት አልተቻለም። ገጹን ያድሱ።"
     );
+
     console.error("Dashboard loading error:", error);
   }
 }

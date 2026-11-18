@@ -242,5 +242,55 @@
       <span data-i18n="footerText">መብቱ የተጠበቀ ነው።</span>
     </p>
   </footer>
+
+  <script>
+    (async function applyPublicSiteSettings() {
+      try {
+        const response = await fetch("/api/site-settings", { headers: { Accept: "application/json" } });
+        if (!response.ok) return;
+        const result = await response.json();
+        const settings = result.data || {};
+        const lang = document.documentElement.lang === "en" ? "en" : "am";
+        const siteName = settings[lang === "am" ? "site_name_am" : "site_name_en"];
+        const tagline = settings[lang === "am" ? "tagline_am" : "tagline_en"];
+        if (siteName) {
+          document.title = siteName + " | " + (lang === "am" ? "የሥራ ማስታወቂያዎች" : "Jobs");
+          const brand = document.querySelector(".site-header .brand > span:last-child");
+          const footerBrand = document.querySelector(".footer-brand > span:last-child");
+          if (brand) brand.textContent = siteName;
+          if (footerBrand) footerBrand.textContent = siteName;
+        }
+        if (tagline) {
+          const heroText = document.querySelector(".hero-content > p");
+          if (heroText) heroText.textContent = tagline;
+        }
+        if (settings.primary_color) {
+          document.documentElement.style.setProperty("--navy", settings.primary_color);
+          document.documentElement.style.setProperty("--navy2", settings.primary_color);
+          document.documentElement.style.setProperty("--primary", settings.primary_color);
+        }
+        if (settings.accent_color) {
+          document.documentElement.style.setProperty("--gold", settings.accent_color);
+          document.documentElement.style.setProperty("--accent", settings.accent_color);
+        }
+        if (settings.logo_url) {
+          const mark = document.querySelector(".site-header .brand-mark");
+          if (mark) {
+            const logo = document.createElement("img");
+            logo.src = settings.logo_url;
+            logo.alt = siteName || "Site logo";
+            logo.width = 38;
+            logo.height = 38;
+            logo.loading = "lazy";
+            logo.style.objectFit = "contain";
+            mark.replaceWith(logo);
+          }
+        }
+      } catch (error) {
+        console.warn("Unable to apply site settings", error);
+      }
+    })();
+  </script>
+
 </body>
 </html>

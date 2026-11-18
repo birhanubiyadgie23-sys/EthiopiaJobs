@@ -175,8 +175,6 @@ async function loadSiteSettings() {
           link.textContent = (language === "am" ? "ስልክ፦ " : "Phone: ") + phone;
           contactDetails.appendChild(link);
         }
-      } else {
-        contactSection.hidden = true;
       }
     }
 

@@ -7,7 +7,8 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Admin Dashboard | Ethiopia Jobs</title>
 
-  <style>
+ 
+<style>
     * {
       box-sizing: border-box;
     }
@@ -265,6 +266,24 @@
       color: #dc2626;
     }
 
+    /* Job status buttons */
+
+    .job-action-button {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .job-action-button.publish {
+      background: #15803d;
+    }
+
+    .job-action-button.draft {
+      background: #d97706;
+    }
+
     footer {
       text-align: center;
       padding: 25px;
@@ -294,7 +313,8 @@
         grid-column: auto;
       }
     }
-  </style>
+</style>
+
 </head>
 
 <body>
@@ -703,7 +723,7 @@ function renderJobs(jobs) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
 
-    cell.colSpan = 4;
+    cell.colSpan = 5;
     cell.className = "empty";
     cell.textContent = "እስካሁን የስራ ማስታወቂያ የለም።";
 
@@ -725,7 +745,8 @@ function renderJobs(jobs) {
     const status = document.createElement("span");
 
     status.className =
-      "status " + (job.status === "published" ? "published" :
+      "status " +
+      (job.status === "published" ? "published" :
       job.status === "draft" ? "draft" : "");
 
     status.textContent = statusLabel(job.status);
@@ -734,11 +755,40 @@ function renderJobs(jobs) {
     const date = document.createElement("td");
     date.textContent = formatDate(job.published_at);
 
-    row.append(title, organization, statusCell, date);
+    const actionCell = document.createElement("td");
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "job-action-button";
+
+    button.dataset.jobId = String(job.id);
+
+    if (job.status === "published") {
+      button.textContent = "Draft አድርግ";
+      button.dataset.nextStatus = "draft";
+      button.classList.add("draft");
+    } else if (job.status === "draft") {
+      button.textContent = "Publish አድርግ";
+      button.dataset.nextStatus = "published";
+      button.classList.add("publish");
+    } else {
+      button.textContent = "ማቀየር አይቻልም";
+      button.disabled = true;
+    }
+
+    actionCell.appendChild(button);
+
+    row.append(
+      title,
+      organization,
+      statusCell,
+      date,
+      actionCell
+    );
+
     tbody.appendChild(row);
   });
 }
-
 async function checkSession() {
   try {
     const result = await requestJSON("/api/admin/me");
@@ -867,7 +917,38 @@ async function createJob(event) {
     button.textContent = "ስራውን Draft አድርገህ አስቀምጥ";
   }
 }
+async function changeJobStatus(id, nextStatus) {
+  const actionText = nextStatus === "published"
+    ? "Publish"
+    : "Draft";
 
+  if (!window.confirm(`ይህን ስራ ${actionText} ማድረግ ትፈልጋለህ?`)) {
+    return;
+  }
+
+  try {
+    await requestJSON(
+      `/api/admin/jobs?id=${encodeURIComponent(id)}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "status",
+          status: nextStatus
+        })
+      }
+    );
+
+    await loadDashboard();
+
+  } catch (error) {
+    showMessage(
+      error.message || "የስራውን ሁኔታ መቀየር አልተቻለም።"
+    );
+  }
+}
 async function logout() {
   $("logoutButton").disabled = true;
 
@@ -893,9 +974,21 @@ async function startDashboard() {
 }
 
 $("jobForm").addEventListener("submit", createJob);
+
 $("logoutButton").addEventListener("click", logout);
+
 $("refreshButton").addEventListener("click", loadDashboard);
 
+$("jobsTable").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-job-id]");
+
+  if (!button || button.disabled) return;
+
+  changeJobStatus(
+    button.dataset.jobId,
+    button.dataset.nextStatus
+  );
+});
 startDashboard();
 </script>
 

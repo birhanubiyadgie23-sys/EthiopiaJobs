@@ -53,7 +53,11 @@
       border-radius: 7px;
       padding: 10px 15px;
       font-size: 14px;
-      text-decoration: none;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
     }
 
     #logoutButton {
@@ -119,6 +123,77 @@
       color: #123b66;
     }
 
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: bold;
+      color: #334155;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-family: inherit;
+      font-size: 15px;
+      background: white;
+      color: #1e293b;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: 2px solid #2563eb;
+      border-color: #2563eb;
+    }
+
+    .help {
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .primary-button {
+      background: #123b66;
+      color: white;
+      padding: 13px 20px;
+      font-weight: bold;
+    }
+
+    #formMessage {
+      margin-top: 15px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .success {
+      color: #15803d;
+    }
+
+    .error {
+      color: #dc2626;
+    }
+
     .table-wrap {
       overflow-x: auto;
     }
@@ -160,14 +235,10 @@
       color: #92400e;
     }
 
-    .empty, .error {
+    .empty {
       padding: 20px;
       text-align: center;
       color: #64748b;
-    }
-
-    .error {
-      color: #dc2626;
     }
 
     .actions {
@@ -180,6 +251,7 @@
       display: inline-block;
       background: #123b66;
       color: white;
+      text-decoration: none;
     }
 
     #refreshButton {
@@ -189,8 +261,8 @@
 
     #pageMessage {
       margin: 15px 0;
-      color: #dc2626;
       font-size: 14px;
+      color: #dc2626;
     }
 
     footer {
@@ -200,7 +272,7 @@
       font-size: 13px;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 650px) {
       header {
         padding: 16px;
       }
@@ -212,6 +284,14 @@
 
       .panel {
         padding: 15px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.full {
+        grid-column: auto;
       }
     }
   </style>
@@ -263,6 +343,224 @@
       <strong id="activeNewspapers">—</strong>
     </div>
   </section>
+
+  <!-- ADD JOB FORM -->
+
+  <section class="panel">
+    <h3>አዲስ የስራ ማስታወቂያ ጨምር</h3>
+
+    <p class="help">
+      የስራ ማስታወቂያው መጀመሪያ Draft ሆኖ ይቀመጣል።
+      ከማተም በፊት መረጃውን መፈተሽ ያስፈልጋል።
+    </p>
+
+    <form id="jobForm">
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label for="title_am">የስራ ርዕስ (አማርኛ) *</label>
+          <input
+            id="title_am"
+            name="title_am"
+            type="text"
+            maxlength="250"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="title_en">Job Title (English)</label>
+          <input
+            id="title_en"
+            name="title_en"
+            type="text"
+            maxlength="250"
+          >
+        </div>
+
+        <div class="field full">
+          <label for="organization_name">የድርጅቱ ስም *</label>
+          <input
+            id="organization_name"
+            name="organization_name"
+            type="text"
+            maxlength="250"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="category_id">የስራ ዘርፍ</label>
+          <select id="category_id" name="category_id">
+            <option value="">ዘርፍ ይምረጡ</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="location_id">የስራ ቦታ</label>
+          <select id="location_id" name="location_id">
+            <option value="">አካባቢ ይምረጡ</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="employment_type">የቅጥር አይነት</label>
+          <input
+            id="employment_type"
+            name="employment_type"
+            type="text"
+            maxlength="100"
+            placeholder="Full-time, Contract..."
+          >
+        </div>
+
+        <div class="field">
+          <label for="education_level">የትምህርት ደረጃ</label>
+          <input
+            id="education_level"
+            name="education_level"
+            type="text"
+            maxlength="150"
+            placeholder="Degree, Diploma..."
+          >
+        </div>
+
+        <div class="field">
+          <label for="experience_years">የስራ ልምድ (ዓመት)</label>
+          <input
+            id="experience_years"
+            name="experience_years"
+            type="number"
+            min="0"
+            max="80"
+            step="0.5"
+          >
+        </div>
+
+        <div class="field">
+          <label for="deadline_at">የማመልከቻ መጨረሻ ቀን</label>
+          <input
+            id="deadline_at"
+            name="deadline_at"
+            type="date"
+          >
+        </div>
+
+        <div class="field full">
+          <label for="description_am">የስራው መግለጫ (አማርኛ)</label>
+          <textarea
+            id="description_am"
+            name="description_am"
+            maxlength="20000"
+          ></textarea>
+        </div>
+
+        <div class="field full">
+          <label for="description_en">Job Description (English)</label>
+          <textarea
+            id="description_en"
+            name="description_en"
+            maxlength="20000"
+          ></textarea>
+        </div>
+
+        <div class="field full">
+          <label for="requirements_am">መስፈርቶች (አማርኛ)</label>
+          <textarea
+            id="requirements_am"
+            name="requirements_am"
+            maxlength="15000"
+          ></textarea>
+        </div>
+
+        <div class="field full">
+          <label for="requirements_en">Requirements (English)</label>
+          <textarea
+            id="requirements_en"
+            name="requirements_en"
+            maxlength="15000"
+          ></textarea>
+        </div>
+
+        <div class="field full">
+          <label for="application_method_am">የማመልከቻ መንገድ (አማርኛ)</label>
+          <textarea
+            id="application_method_am"
+            name="application_method_am"
+            maxlength="5000"
+          ></textarea>
+        </div>
+
+        <div class="field full">
+          <label for="application_method_en">Application Method (English)</label>
+          <textarea
+            id="application_method_en"
+            name="application_method_en"
+            maxlength="5000"
+          ></textarea>
+        </div>
+
+        <div class="field">
+          <label for="application_url">የማመልከቻ ድረገጽ</label>
+          <input
+            id="application_url"
+            name="application_url"
+            type="url"
+            maxlength="2000"
+            placeholder="https://..."
+          >
+        </div>
+
+        <div class="field">
+          <label for="application_email">የማመልከቻ Email</label>
+          <input
+            id="application_email"
+            name="application_email"
+            type="email"
+            maxlength="254"
+          >
+        </div>
+
+        <div class="field">
+          <label for="application_phone">ስልክ ቁጥር</label>
+          <input
+            id="application_phone"
+            name="application_phone"
+            type="text"
+            maxlength="80"
+          >
+        </div>
+
+        <div class="field">
+          <label for="source_reference">የመረጃ ምንጭ / Reference</label>
+          <input
+            id="source_reference"
+            name="source_reference"
+            type="text"
+            maxlength="2000"
+            placeholder="የጋዜጣ ስም፣ ሊንክ..."
+          >
+        </div>
+
+      </div>
+
+      <div style="margin-top:22px">
+        <button
+          type="submit"
+          id="saveJobButton"
+          class="primary-button"
+        >
+          ስራውን Draft አድርገህ አስቀምጥ
+        </button>
+      </div>
+
+      <div id="formMessage" role="status" aria-live="polite"></div>
+
+    </form>
+  </section>
+
+  <!-- RECENT JOBS -->
 
   <section class="panel">
     <h3>የቅርብ ጊዜ የስራ ማስታወቂያዎች</h3>
@@ -328,12 +626,12 @@ async function requestJSON(url, options = {}) {
   return result;
 }
 
-function showMessage(message) {
-  $("pageMessage").textContent = message;
-}
-
 function setStat(id, value) {
   $(id).textContent = String(value);
+}
+
+function showMessage(message) {
+  $("pageMessage").textContent = message;
 }
 
 function formatDate(value) {
@@ -356,6 +654,44 @@ function statusLabel(status) {
   };
 
   return labels[status] || status || "—";
+}
+
+function addOption(select, value, label) {
+  const option = document.createElement("option");
+  option.value = String(value);
+  option.textContent = label;
+  select.appendChild(option);
+}
+
+function renderCategories(categories) {
+  const select = $("category_id");
+  select.replaceChildren();
+
+  addOption(select, "", "ዘርፍ ይምረጡ");
+
+  categories.forEach((item) => {
+    const label = item.name_am || item.name_en || "ያልተሰየመ ዘርፍ";
+    addOption(select, item.id, label);
+  });
+}
+
+function renderLocations(locations) {
+  const select = $("location_id");
+  select.replaceChildren();
+
+  addOption(select, "", "አካባቢ ይምረጡ");
+
+  locations.forEach((item) => {
+    const city = item.city_am || item.city_en || "";
+    const region = item.region_am || item.region_en || "";
+    const label = [city, region].filter(Boolean).join(" — ");
+
+    addOption(
+      select,
+      item.id,
+      label || "አካባቢ #" + item.id
+    );
+  });
 }
 
 function renderJobs(jobs) {
@@ -414,7 +750,7 @@ async function checkSession() {
     $("adminEmail").textContent = result.admin.email;
     return true;
 
-  } catch (error) {
+  } catch {
     window.location.replace("/admin.html");
     return false;
   }
@@ -424,13 +760,17 @@ async function loadDashboard() {
   showMessage("");
 
   try {
-    const [jobsResult, categoriesResult, locationsResult,
-      newspapersResult] = await Promise.all([
-        requestJSON("/api/jobs?page=1&limit=10"),
-        requestJSON("/api/categories"),
-        requestJSON("/api/locations"),
-        requestJSON("/api/newspapers")
-      ]);
+    const [
+      jobsResult,
+      categoriesResult,
+      locationsResult,
+      newspapersResult
+    ] = await Promise.all([
+      requestJSON("/api/jobs?page=1&limit=10"),
+      requestJSON("/api/categories"),
+      requestJSON("/api/locations"),
+      requestJSON("/api/newspapers")
+    ]);
 
     const jobs = Array.isArray(jobsResult.data)
       ? jobsResult.data : [];
@@ -464,13 +804,67 @@ async function loadDashboard() {
       newspapers.filter((item) => item.is_active === true).length
     );
 
+    renderCategories(categories);
+    renderLocations(locations);
     renderJobs(jobs);
 
   } catch (error) {
     showMessage(
-      "መረጃዎችን ማምጣት አልተቻለም። እባክዎ ገጹን ያድሱ።"
+      "መረጃዎችን ማምጣት አልተቻለም። ገጹን ያድሱ።"
     );
     console.error("Dashboard loading error:", error);
+  }
+}
+
+async function createJob(event) {
+  event.preventDefault();
+
+  const form = $("jobForm");
+  const button = $("saveJobButton");
+  const message = $("formMessage");
+
+  message.textContent = "";
+  message.className = "";
+
+  if (!form.reportValidity()) return;
+
+  const formData = new FormData(form);
+  const payload = Object.fromEntries(formData.entries());
+
+  button.disabled = true;
+  button.textContent = "በማስቀመጥ ላይ...";
+
+  try {
+    const result = await requestJSON("/api/admin/jobs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!result.ok) {
+      throw new Error("ስራውን ማስቀመጥ አልተቻለም።");
+    }
+
+    form.reset();
+
+    message.textContent =
+      "ስራው በተሳካ ሁኔታ Draft ሆኖ ተቀምጧል።";
+
+    message.className = "success";
+
+    await loadDashboard();
+
+  } catch (error) {
+    message.textContent =
+      error.message || "ስራውን ማስቀመጥ አልተቻለም።";
+
+    message.className = "error";
+
+  } finally {
+    button.disabled = false;
+    button.textContent = "ስራውን Draft አድርገህ አስቀምጥ";
   }
 }
 
@@ -484,7 +878,7 @@ async function logout() {
 
     window.location.replace("/admin.html");
 
-  } catch (error) {
+  } catch {
     showMessage("Logout አልተሳካም። እንደገና ይሞክሩ።");
     $("logoutButton").disabled = false;
   }
@@ -498,6 +892,7 @@ async function startDashboard() {
   await loadDashboard();
 }
 
+$("jobForm").addEventListener("submit", createJob);
 $("logoutButton").addEventListener("click", logout);
 $("refreshButton").addEventListener("click", loadDashboard);
 

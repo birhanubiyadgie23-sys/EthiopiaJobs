@@ -515,7 +515,8 @@
       <button type="button" class="secondary-button" id="reloadSettingsButton">እንደገና ጫን</button>
     </div><div id="settingsMessage" role="status" aria-live="polite"></div></form>
   </section>
-\n  <!-- JOBS TABLE -->
+
+  <!-- JOBS TABLE -->
 
   <section class="panel">
     <h3>የቅርብ ጊዜ የስራ ማስታወቂያዎች</h3>
@@ -1234,7 +1235,10 @@ async function startDashboard() {
 // EVENT LISTENERS
 // ==========================================
 
-$("jobForm").addEventListener("submit", createJob);\n$("siteSettingsForm").addEventListener("submit", saveSiteSettings);\n$("reloadSettingsButton").addEventListener("click", () => loadSiteSettings().catch((error) => { $("settingsMessage").textContent = error.message; }));\naddTranslationControls();
+$("jobForm").addEventListener("submit", createJob);
+$("siteSettingsForm").addEventListener("submit", saveSiteSettings);
+$("reloadSettingsButton").addEventListener("click", () => loadSiteSettings().catch((error) => { $("settingsMessage").textContent = error.message; }));
+addTranslationControls();
 
 $("cancelEditButton").addEventListener("click", () => {
   resetJobForm();

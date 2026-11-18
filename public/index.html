@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="am">
 <head>
@@ -35,22 +36,47 @@
         <span class="eyebrow" data-i18n="eyebrow">የኢትዮጵያ የሥራ ዕድሎች ማዕከል</span>
         <h1 data-i18n="heroTitle">ትክክለኛውን የሥራ ዕድል<br>በቀላሉ ያግኙ</h1>
         <p data-i18n="heroText">ከጋዜጦችና ከታመኑ ምንጮች የወጡ የሥራ ማስታወቂያዎችን በአንድ ቦታ ይፈልጉ።</p>
+
         <form class="search-panel" id="search-form">
           <label class="search-field">
             <span data-i18n="searchLabel">የሥራ ስም ወይም ድርጅት</span>
             <input id="job-search" type="search" placeholder="ለምሳሌ፦ Accountant" data-i18n-placeholder="searchPlaceholder">
           </label>
+
           <label class="search-field location-field">
             <span data-i18n="locationLabel">ከተማ / ክልል</span>
             <input id="location-search" type="text" placeholder="Addis Ababa" data-i18n-placeholder="locationPlaceholder">
           </label>
+
+          <label class="search-field category-field">
+            <span data-i18n="categoryLabel">የሥራ ዘርፍ</span>
+            <select id="category-search">
+              <option value="" data-i18n="allCategories">ሁሉም ዘርፎች</option>
+            </select>
+          </label>
+
           <button class="search-button" type="submit" data-i18n="searchButton">ፈልግ</button>
         </form>
-        <div class="hero-note"><span class="status-dot"></span><span data-i18n="heroNote">የማስታወቂያዎች ምንጭ በግልጽ ይጠቀሳል</span></div>
+
+        <div class="hero-note">
+          <span class="status-dot"></span>
+          <span data-i18n="heroNote">የማስታወቂያዎች ምንጭ በግልጽ ይጠቀሳል</span>
+        </div>
       </div>
+
       <div class="hero-art" aria-hidden="true">
-        <div class="art-card art-card-main"><span class="art-icon">↗</span><div class="art-line wide"></div><div class="art-line"></div><div class="art-line short"></div><div class="art-pill"></div></div>
-        <div class="art-card art-card-small"><span class="art-check">✓</span><div class="art-line"></div><div class="art-line short"></div></div>
+        <div class="art-card art-card-main">
+          <span class="art-icon">↗</span>
+          <div class="art-line wide"></div>
+          <div class="art-line"></div>
+          <div class="art-line short"></div>
+          <div class="art-pill"></div>
+        </div>
+        <div class="art-card art-card-small">
+          <span class="art-check">✓</span>
+          <div class="art-line"></div>
+          <div class="art-line short"></div>
+        </div>
         <div class="art-orbit"></div>
       </div>
     </section>
@@ -63,18 +89,30 @@
 
     <section class="content-section" id="latest">
       <div class="section-heading">
-        <div><span class="eyebrow" data-i18n="latestEyebrow">አሁን ይመልከቱ</span><h2 data-i18n="latestTitle">የቅርብ ጊዜ ማስታወቂያዎች</h2></div>
+        <div>
+          <span class="eyebrow" data-i18n="latestEyebrow">አሁን ይመልከቱ</span>
+          <h2 data-i18n="latestTitle">የቅርብ ጊዜ ማስታወቂያዎች</h2>
+        </div>
         <span class="coming-soon" data-i18n="phaseLabel">Phase 1 · መሠረታዊ ዝግጅት</span>
       </div>
+
       <div class="jobs-status" id="jobs-status" role="status" aria-live="polite"></div>
       <div class="jobs-grid" id="jobs-list"></div>
-      <div class="pagination" id="jobs-pagination" hidden><button type="button" id="jobs-prev">ቀዳሚ</button><span id="jobs-page-label"></span><button type="button" id="jobs-next">ቀጣይ</button></div>
+
+      <div class="pagination" id="jobs-pagination" hidden>
+        <button type="button" id="jobs-prev">ቀዳሚ</button>
+        <span id="jobs-page-label"></span>
+        <button type="button" id="jobs-next">ቀጣይ</button>
+      </div>
     </section>
 
     <section class="source-band" id="sources">
-      <div><span class="eyebrow" data-i18n="sourceEyebrow">ታማኝ ምንጮች</span><h2 data-i18n="sourceTitle">ምንጩን እናሳያለን።</h2><p data-i18n="sourceText">የሥራ ማስታወቂያው የታተመበትን ጋዜጣ፣ ቀንና የመጀመሪያ የማመልከቻ መንገድ በግልጽ እናቀርባለን።</p></div>
-        <div class="source-seal">SOURCE<br><strong>FIRST</strong></div>
+      <div>
+        <span class="eyebrow" data-i18n="sourceEyebrow">ታማኝ ምንጮች</span>
+        <h2 data-i18n="sourceTitle">ምንጩን እናሳያለን።</h2>
+        <p data-i18n="sourceText">የሥራ ማስታወቂያው የታተመበትን ጋዜጣ፣ ቀንና የመጀመሪያ የማመልከቻ መንገድ በግልጽ እናቀርባለን።</p>
       </div>
+      <div class="source-seal">SOURCE<br><strong>FIRST</strong></div>
     </section>
 
     <section class="about-section" id="about">
@@ -83,6 +121,12 @@
     </section>
   </main>
 
-  <footer class="site-footer"><a class="brand footer-brand" href="/"><span class="brand-mark">EJ</span><span>Ethiopia <strong>Jobs</strong></span></a><p>© <span id="year"></span> Ethiopia Jobs. <span data-i18n="footerText">መብቱ የተጠበቀ ነው።</span></p></footer>
+  <footer class="site-footer">
+    <a class="brand footer-brand" href="/">
+      <span class="brand-mark">EJ</span>
+      <span>Ethiopia <strong>Jobs</strong></span>
+    </a>
+    <p>© <span id="year"></span> Ethiopia Jobs. <span data-i18n="footerText">መብቱ የተጠበቀ ነው።</span></p>
+  </footer>
 </body>
 </html>

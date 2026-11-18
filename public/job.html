@@ -1,1 +1,87 @@
-<!doctype html><html lang="am"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Ethiopia Jobs — የሥራ ማስታወቂያ ዝርዝር"><title>Job details | Ethiopia Jobs</title><link rel="stylesheet" href="/assets/css/styles.css"><style>.detail-wrap{max-width:900px;margin:auto;padding:54px 24px 80px}.detail-panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:30px}.detail-panel h1{color:var(--navy);font-size:clamp(25px,4vw,36px);line-height:1.5}.detail-panel h2{font-size:17px;color:var(--navy);margin-top:28px}.detail-panel p,.detail-panel li{color:#526779;line-height:2;white-space:pre-line}.detail-meta{display:flex;flex-wrap:wrap;gap:8px}.detail-meta span{background:#f1f4f7;border-radius:20px;padding:7px 11px;font-size:12px}.apply-note{padding:16px;background:#f8f4e9;border-radius:10px}.back-link{display:inline-block;margin-bottom:18px;color:var(--navy);font-weight:700}@media(max-width:600px){.detail-panel{padding:20px}}</style><script src="/assets/js/job-detail.js" defer></script></head><body><header class="site-header"><a class="brand" href="/"><span class="brand-mark">EJ</span><span>Ethiopia <strong>Jobs</strong></span></a><div class="header-actions"><button class="language-toggle" id="language-toggle" type="button">EN</button></div></header><main class="detail-wrap"><a class="back-link" href="/">← <span id="back-label">ወደ ዋናው ገጽ</span></a><div id="job-detail" class="detail-panel" role="status" aria-live="polite">በመጫን ላይ...</div></main></body></html>
+
+<!doctype html>
+<html lang="am">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102b46">
+  <meta name="description" content="Ethiopia Jobs — የሥራ ማስታወቂያ ዝርዝር">
+  <title>Job details | Ethiopia Jobs</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Ethiopic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script src="/assets/js/job-detail.js" defer></script>
+</head>
+
+<body class="detail-page">
+
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Ethiopia Jobs home">
+      <span class="brand-mark">EJ</span>
+      <span>Ethiopia <strong>Jobs</strong></span>
+    </a>
+
+    <nav class="desktop-nav">
+      <a href="/#latest">አዳዲስ ሥራዎች</a>
+      <a href="/#sources">ምንጮች</a>
+      <a href="/#about">ስለ እኛ</a>
+    </nav>
+
+    <div class="header-actions">
+      <button
+        class="language-toggle"
+        id="language-toggle"
+        type="button"
+        aria-label="Change language"
+      >EN</button>
+
+      <a class="admin-link" href="/admin">Admin</a>
+    </div>
+  </header>
+
+  <main class="detail-container">
+
+    <div class="detail-breadcrumb">
+      <a href="/" class="detail-back">
+        ← <span id="back-label">ወደ ሁሉም ሥራዎች ተመለስ</span>
+      </a>
+
+      <span class="breadcrumb-current">Job Details</span>
+    </div>
+
+    <div
+      id="job-detail-status"
+      class="detail-status"
+      role="status"
+      aria-live="polite"
+    >
+      የሥራ መረጃውን በማምጣት ላይ...
+    </div>
+
+    <div
+      id="job-detail-content"
+      class="detail-layout"
+      hidden
+    ></div>
+
+  </main>
+
+  <footer class="site-footer detail-footer">
+    <a class="brand footer-brand" href="/">
+      <span class="brand-mark">EJ</span>
+      <span>Ethiopia <strong>Jobs</strong></span>
+    </a>
+
+    <p>© <span id="detail-year"></span> Ethiopia Jobs. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById("detail-year").textContent =
+      new Date().getFullYear();
+  </script>
+
+</body>
+</html>

@@ -14,7 +14,7 @@ const SESSION_SECONDS = 60 * 60 * 24 * 30;
 function validEmail(value) {
   return typeof value === "string" &&
     value.length <= 254 &&
-    /^[^\s@]+@[^\s@]+\\.[^\s@]+$/.test(value.trim());
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
 
 async function ensureUsersTable() {

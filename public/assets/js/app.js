@@ -88,6 +88,22 @@ let loadingFailed = false;
 let requestNumber = 0;
 let siteSettings = {};
 
+function applyPublicContactLanguage() {
+  const eyebrow = $("#public-contact-eyebrow");
+  const title = $("#public-contact-title");
+  if (eyebrow) eyebrow.textContent = language === "am" ? "ያግኙን" : "CONTACT";
+  if (title) title.textContent = language === "am" ? "አግኙን" : "Contact us";
+
+  document.querySelectorAll("[data-contact-type]").forEach((link) => {
+    const type = link.dataset.contactType;
+    const value = link.dataset.contactValue || "";
+    const label = type === "email"
+      ? (language === "am" ? "ኢሜይል፦ " : "Email: ")
+      : (language === "am" ? "ስልክ፦ " : "Phone: ");
+    link.textContent = label + value;
+  });
+}
+
 function applySiteSettingsLanguage() {
   const siteName = siteSettings[language === "am" ? "site_name_am" : "site_name_en"];
   const tagline = siteSettings[language === "am" ? "tagline_am" : "tagline_en"];
@@ -115,6 +131,42 @@ async function loadSiteSettings() {
     if (!response.ok) return;
     const result = await response.json();
     siteSettings = result.data || {};
+
+    // Public contact details are intentionally rendered from the saved Site Settings.
+    const contactSection = $("#contact");
+    const contactDetails = $("#public-contact-details");
+    if (contactSection && contactDetails) {
+      const email = String(siteSettings.contact_email || "").trim();
+      const phone = String(siteSettings.contact_phone || "").trim();
+      contactDetails.replaceChildren();
+
+      if (email || phone) {
+        contactSection.hidden = false;
+        const eyebrow = $("#public-contact-eyebrow");
+        const title = $("#public-contact-title");
+        if (eyebrow) eyebrow.textContent = language === "am" ? "ያግኙን" : "CONTACT";
+        if (title) title.textContent = language === "am" ? "አግኙን" : "Contact us";
+
+        if (email) {
+          const link = document.createElement("a");
+          link.href = "mailto:" + email;
+          link.dataset.contactType = "email";
+          link.dataset.contactValue = email;
+          link.textContent = (language === "am" ? "ኢሜይል፦ " : "Email: ") + email;
+          contactDetails.appendChild(link);
+        }
+        if (phone) {
+          const link = document.createElement("a");
+          link.href = "tel:" + phone.replace(/[^+0-9]/g, "");
+          link.dataset.contactType = "phone";
+          link.dataset.contactValue = phone;
+          link.textContent = (language === "am" ? "ስልክ፦ " : "Phone: ") + phone;
+          contactDetails.appendChild(link);
+        }
+      } else {
+        contactSection.hidden = true;
+      }
+    }
 
     if (siteSettings.primary_color) {
       document.documentElement.style.setProperty("--navy", siteSettings.primary_color);
@@ -463,6 +515,7 @@ function setLanguage(nextLanguage) {
   language = nextLanguage;
   document.documentElement.lang = language;
   applySiteSettingsLanguage();
+  applyPublicContactLanguage();
 
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     const translation =

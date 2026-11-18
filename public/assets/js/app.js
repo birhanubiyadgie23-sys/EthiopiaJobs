@@ -1,3 +1,4 @@
+
 "use strict";
 
 const translations = {
@@ -12,6 +13,8 @@ const translations = {
     searchPlaceholder: "ለምሳሌ፦ Accountant",
     locationLabel: "ከተማ / ክልል",
     locationPlaceholder: "Addis Ababa",
+    categoryLabel: "የሥራ ዘርፍ",
+    allCategories: "ሁሉም ዘርፎች",
     searchButton: "ፈልግ",
     heroNote: "የማስታወቂያዎች ምንጭ በግልጽ ይጠቀሳል",
     statOne: "የተለያዩ የሥራ ምንጮች",
@@ -35,6 +38,7 @@ const translations = {
     page: "ገጽ",
     announcements: "ማስታወቂያዎች"
   },
+
   en: {
     navLatest: "Latest jobs",
     navSources: "Sources",
@@ -46,6 +50,8 @@ const translations = {
     searchPlaceholder: "e.g. Accountant",
     locationLabel: "City / Region",
     locationPlaceholder: "Addis Ababa",
+    categoryLabel: "Job category",
+    allCategories: "All categories",
     searchButton: "Search",
     heroNote: "Every listing clearly identifies its source",
     statOne: "Multiple job sources",
@@ -76,6 +82,7 @@ let currentPage = 1;
 let totalPages = 1;
 let totalJobs = 0;
 let jobs = [];
+let categories = [];
 let loadingFailed = false;
 let requestNumber = 0;
 
@@ -93,9 +100,14 @@ function escapeHtml(value) {
 
 function formatDate(value) {
   if (!value) return "";
+
   const dateValue = new Date(`${String(value).slice(0, 10)}T00:00:00`);
+
   if (Number.isNaN(dateValue.getTime())) return "";
-  return dateValue.toLocaleDateString(language === "am" ? "am-ET" : "en-ET");
+
+  return dateValue.toLocaleDateString(
+    language === "am" ? "am-ET" : "en-ET"
+  );
 }
 
 function updateStatus() {
@@ -105,7 +117,8 @@ function updateStatus() {
   if (loadingFailed) {
     status.textContent = translations[language].loadError;
   } else if (totalJobs > 0) {
-    status.textContent = `${totalJobs} ${translations[language].announcements}`;
+    status.textContent =
+      `${totalJobs} ${translations[language].announcements}`;
   } else {
     status.textContent = "";
   }
@@ -116,11 +129,74 @@ function updatePagination() {
   if (!pagination) return;
 
   pagination.hidden = totalPages <= 1;
+
   $("#jobs-prev").disabled = currentPage <= 1;
   $("#jobs-next").disabled = currentPage >= totalPages;
+
   $("#jobs-prev").textContent = translations[language].previous;
   $("#jobs-next").textContent = translations[language].next;
-  $("#jobs-page-label").textContent = `${translations[language].page} ${currentPage} / ${totalPages}`;
+
+  $("#jobs-page-label").textContent =
+    `${translations[language].page} ${currentPage} / ${totalPages}`;
+}
+
+function renderCategories() {
+  const select = $("#category-search");
+  if (!select) return;
+
+  const selectedValue = select.value;
+
+  select.innerHTML = `
+    <option value="">
+      ${escapeHtml(translations[language].allCategories)}
+    </option>
+    ${categories.map((category) => {
+      const name = language === "am"
+        ? (category.name_am || category.name_en)
+        : (category.name_en || category.name_am);
+
+      return `
+        <option value="${escapeHtml(category.id)}">
+          ${escapeHtml(name)}
+        </option>
+      `;
+    }).join("")}
+  `;
+
+  if (
+    selectedValue &&
+    categories.some((category) => String(category.id) === selectedValue)
+  ) {
+    select.value = selectedValue;
+  }
+}
+
+async function loadCategories() {
+  const select = $("#category-search");
+  if (!select) return;
+
+  try {
+    const response = await fetch("/api/categories", {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    });
+
+    const data = await response.json();
+
+    if (
+      !response.ok ||
+      data.ok !== true ||
+      !Array.isArray(data.data)
+    ) {
+      throw new Error("The categories API returned an invalid response.");
+    }
+
+    categories = data.data;
+    renderCategories();
+
+  } catch (error) {
+    console.error("Unable to load categories:", error);
+  }
 }
 
 function renderJobs() {
@@ -128,7 +204,11 @@ function renderJobs() {
   if (!list) return;
 
   if (!jobs.length) {
-    list.innerHTML = `<div class="jobs-empty">${escapeHtml(translations[language].noJobs)}</div>`;
+    list.innerHTML = `
+      <div class="jobs-empty">
+        ${escapeHtml(translations[language].noJobs)}
+      </div>
+    `;
     return;
   }
 
@@ -136,15 +216,19 @@ function renderJobs() {
     const title = language === "am"
       ? (job.title_am || job.title_en)
       : (job.title_en || job.title_am);
+
     const city = language === "am"
       ? (job.city_am || job.city_en)
       : (job.city_en || job.city_am);
+
     const region = language === "am"
       ? (job.region_am || job.region_en)
       : (job.region_en || job.region_am);
+
     const category = language === "am"
       ? (job.category_am || job.category_en)
       : (job.category_en || job.category_am);
+
     const place = [city, region].filter(Boolean).join(" · ");
 
     return `
@@ -170,17 +254,28 @@ function setLanguage(nextLanguage) {
 
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     const translation = translations[language][element.dataset.i18n];
-    if (translation !== undefined) element.innerHTML = translation;
+
+    if (translation !== undefined) {
+      element.innerHTML = translation;
+    }
   });
 
   document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
-    const translation = translations[language][element.dataset.i18nPlaceholder];
-    if (translation !== undefined) element.placeholder = translation;
+    const translation =
+      translations[language][element.dataset.i18nPlaceholder];
+
+    if (translation !== undefined) {
+      element.placeholder = translation;
+    }
   });
 
   const languageButton = $("#language-toggle");
-  if (languageButton) languageButton.textContent = language === "am" ? "EN" : "አማ";
 
+  if (languageButton) {
+    languageButton.textContent = language === "am" ? "EN" : "አማ";
+  }
+
+  renderCategories();
   updateStatus();
   updatePagination();
   renderJobs();
@@ -189,26 +284,45 @@ function setLanguage(nextLanguage) {
 async function loadJobs() {
   const thisRequest = ++requestNumber;
   const status = $("#jobs-status");
-  if (status) status.textContent = translations[language].loading;
+
+  if (status) {
+    status.textContent = translations[language].loading;
+  }
 
   const params = new URLSearchParams({
     page: String(currentPage),
     limit: "10"
   });
+
   const keyword = $("#job-search")?.value.trim() || "";
   const location = $("#location-search")?.value.trim() || "";
+  const categoryId = $("#category-search")?.value || "";
 
-  if (keyword) params.set("q", keyword);
-  if (location) params.set("location", location);
+  if (keyword) {
+    params.set("q", keyword);
+  }
+
+  if (location) {
+    params.set("location", location);
+  }
+
+  if (categoryId) {
+    params.set("category_id", categoryId);
+  }
 
   try {
     const response = await fetch(`/api/jobs?${params.toString()}`, {
       headers: { Accept: "application/json" },
       cache: "no-store"
     });
+
     const data = await response.json();
 
-    if (!response.ok || data.ok !== true || !Array.isArray(data.data)) {
+    if (
+      !response.ok ||
+      data.ok !== true ||
+      !Array.isArray(data.data)
+    ) {
       throw new Error("The jobs API returned an invalid response.");
     }
 
@@ -219,9 +333,12 @@ async function loadJobs() {
     totalPages = Math.max(1, Number(data.pagination?.pages || 1));
     currentPage = Math.min(currentPage, totalPages);
     loadingFailed = false;
+
   } catch (error) {
     if (thisRequest !== requestNumber) return;
+
     console.error("Unable to load jobs:", error);
+
     jobs = [];
     totalJobs = 0;
     totalPages = 1;
@@ -239,8 +356,10 @@ $("#language-toggle")?.addEventListener("click", () => {
 
 $("#search-form")?.addEventListener("submit", (event) => {
   event.preventDefault();
+
   currentPage = 1;
   loadJobs();
+
   $("#latest")?.scrollIntoView({ behavior: "smooth" });
 });
 
@@ -259,7 +378,11 @@ $("#jobs-next")?.addEventListener("click", () => {
 });
 
 const yearElement = $("#year");
-if (yearElement) yearElement.textContent = new Date().getFullYear();
+
+if (yearElement) {
+  yearElement.textContent = new Date().getFullYear();
+}
 
 setLanguage("am");
+loadCategories();
 loadJobs();

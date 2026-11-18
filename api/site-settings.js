@@ -63,31 +63,6 @@ export default async function handler(req, res) {
 
 
     const body = req.body || {};
-    if (body.action === "translate") {
-      const { text, source, target } = body;
-      if (typeof text !== "string" || !text.trim() || text.length > 12000) {
-        return res.status(400).json({ ok: false, error: "Text is required and must be under 12,000 characters" });
-      }
-      if (!["am", "en"].includes(source) || !["am", "en"].includes(target) || source === target) {
-        return res.status(400).json({ ok: false, error: "Choose Amharic to English or English to Amharic" });
-      }
-      const key = process.env.GOOGLE_TRANSLATE_API_KEY;
-      if (!key) {
-        return res.status(503).json({ ok: false, error: "Translation is not configured. Add GOOGLE_TRANSLATE_API_KEY in Vercel Environment Variables." });
-      }
-      const response = await fetch("https://translation.googleapis.com/language/translate/v2?key=" + encodeURIComponent(key), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ q: text, source, target, format: "text" })
-      });
-      const translated = await response.json();
-      if (!response.ok || !translated?.data?.translations?.[0]?.translatedText) {
-        console.error("Translation provider error:", translated?.error?.message || response.status);
-        return res.status(502).json({ ok: false, error: "Translation provider could not translate this text" });
-      }
-      return res.status(200).json({ ok: true, translatedText: translated.data.translations[0].translatedText });
-    }
-
     if (!body || typeof body !== "object" || Array.isArray(body)) {
       return res.status(400).json({ ok: false, error: "Invalid settings" });
     }

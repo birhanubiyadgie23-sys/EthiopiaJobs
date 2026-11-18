@@ -357,6 +357,11 @@
       ከማተም በፊት መረጃውን አረጋግጥ።
     </p>
 
+    <p class="help">
+      ማስታወቂያውን በአማርኛና በEnglish በተለያዩ መስኮች እራስዎ ያስገቡ።
+      አውቶማቲክ ትርጉም አይጠቀምም፤ የሌለውን ቋንቋ መስክ ባዶ መተው ይችላሉ።
+    </p>
+
     <form id="jobForm">
       <div class="form-grid">
 
@@ -514,6 +519,25 @@
       <button type="submit" class="primary-button" id="saveSettingsButton">ቅንብሮቹን አስቀምጥ</button>
       <button type="button" class="secondary-button" id="reloadSettingsButton">እንደገና ጫን</button>
     </div><div id="settingsMessage" role="status" aria-live="polite"></div></form>
+  </section>
+
+  <section class="panel" id="contactInboxPanel">
+    <h3>የጎብኚዎች መልዕክቶች (Contact Inbox) <span id="unreadContactCount" class="status">0 ያልተነበቡ</span></h3>
+    <p class="help">ከድረገጹ Contact Form የተላኩ መልዕክቶች። መልዕክቱን ለማንበብ ክፈት ይጫኑ።</p>
+    <div id="contactInboxMessage" role="status" class="help"></div>
+    <div class="table-wrap">
+      <table style="min-width:760px">
+        <thead><tr><th>ቀን</th><th>ስም</th><th>ኢሜይል</th><th>ርዕስ</th><th>ሁኔታ / ተግባር</th></tr></thead>
+        <tbody id="contactMessagesTable"><tr><td colspan="5" class="empty">መልዕክቶች በማምጣት ላይ...</td></tr></tbody>
+      </table>
+    </div>
+    <div id="contactMessageDetail" class="panel" hidden style="margin-top:16px;box-shadow:none;border:1px solid #e2e8f0">
+      <h4 id="contactDetailSubject"></h4>
+      <p class="help" id="contactDetailMeta"></p>
+      <p id="contactDetailBody" style="white-space:pre-wrap;line-height:1.7"></p>
+      <div class="actions"><a id="contactReplyLink" class="nav-link">በኢሜይል መልስ ስጥ</a><button type="button" id="closeContactDetail" class="secondary-button">ዝጋ</button></div>
+    </div>
+    <div class="actions" style="margin-top:14px"><button type="button" id="refreshContactMessages" class="secondary-button">መልዕክቶችን አድስ</button></div>
   </section>
 
   <!-- JOBS TABLE -->
@@ -835,8 +859,8 @@ async function loadDashboard() {
     ] = await Promise.all([
       requestJSON("/api/admin/jobs?page=1&limit=100"),
       requestJSON("/api/admin/jobs?page=1&limit=1&status=published"),
-      requestJSON("/api/categories"),
-      requestJSON("/api/locations"),
+      requestJSON("/api/lookups?type=categories"),
+      requestJSON("/api/lookups?type=locations"),
       requestJSON("/api/newspapers")
     ]);
 
@@ -1198,29 +1222,83 @@ async function saveSiteSettings(event) {
   } catch(error) { message.textContent = error.message; message.className = "error"; }
   finally { button.disabled = false; }
 }
-const translationPairs = [["title_am","title_en"],["description_am","description_en"],["requirements_am","requirements_en"],["application_method_am","application_method_en"]];
-async function translateField(sourceId,targetId,button) {
-  const text = $(sourceId).value.trim();
-  if (!text) { $("formMessage").textContent = "መጀመሪያ ጽሑፍ ያስገቡ።"; return; }
-  const source = sourceId.endsWith("_am") ? "am" : "en";
-  button.disabled = true; button.textContent = "በመተርጎም...";
-  try {
-    const result = await requestJSON("/api/site-settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"translate",text,source,target:source==="am"?"en":"am"})});
-    $(targetId).value = result.translatedText || "";
-    $("formMessage").textContent = "ትርጉሙን ያረጋግጡና ከዚያ ያስቀምጡ።"; $("formMessage").className="success";
-  } catch(error) { $("formMessage").textContent=error.message; $("formMessage").className="error"; }
-  finally { button.disabled=false; button.textContent=source==="am"?"ወደ English ተርጉም →":"→ ወደ አማርኛ ተርጉም"; }
-}
-function addTranslationControls() {
-  translationPairs.forEach(([am,en]) => [[am,en],[en,am]].forEach(([source,target]) => {
-    const field=$(source), button=document.createElement("button");
-    button.type="button"; button.className="secondary-button"; button.style.marginTop="6px";
-    button.textContent=source.endsWith("_am")?"ወደ English ተርጉም →":"→ ወደ አማርኛ ተርጉም";
-    button.addEventListener("click",()=>translateField(source,target,button));
-    field.insertAdjacentElement("afterend",button);
-  }));
+// Job content is entered in both languages manually. No paid translation API is required.
+
+// CONTACT MESSAGE INBOX
+// ==========================================
+let contactMessages = [];
+
+function renderContactMessages(items) {
+  const tbody = $("contactMessagesTable");
+  tbody.replaceChildren();
+  contactMessages = Array.isArray(items) ? items : [];
+  const unread = contactMessages.filter((item) => !item.is_read).length;
+  $("unreadContactCount").textContent = unread + " ያልተነበቡ";
+  if (!contactMessages.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 5;
+    cell.className = "empty";
+    cell.textContent = "እስካሁን መልዕክት አልተላከም።";
+    row.appendChild(cell);
+    tbody.appendChild(row);
+    return;
+  }
+  contactMessages.forEach((item) => {
+    const row = document.createElement("tr");
+    [formatDate(item.created_at), item.name, item.email, item.subject].forEach((value) => {
+      const cell = document.createElement("td");
+      cell.textContent = value || "—";
+      row.appendChild(cell);
+    });
+    const actionCell = document.createElement("td");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "secondary-button";
+    button.textContent = item.is_read ? "እንደገና ክፈት" : "አንብብ";
+    button.dataset.contactMessageId = String(item.id);
+    actionCell.appendChild(button);
+    row.appendChild(actionCell);
+    tbody.appendChild(row);
+  });
 }
 
+async function loadContactMessages() {
+  const message = $("contactInboxMessage");
+  message.textContent = "መልዕክቶችን በማምጣት ላይ...";
+  try {
+    const result = await requestJSON("/api/contact-messages");
+    renderContactMessages(result.data || []);
+    message.textContent = "";
+  } catch (error) {
+    message.textContent = error.message || "መልዕክቶችን ማምጣት አልተቻለም።";
+  }
+}
+
+async function openContactMessage(id) {
+  const item = contactMessages.find((entry) => String(entry.id) === String(id));
+  if (!item) return;
+  $("contactDetailSubject").textContent = item.subject || "—";
+  $("contactDetailMeta").textContent = item.name + " · " + item.email + " · " + formatDate(item.created_at);
+  $("contactDetailBody").textContent = item.message || "";
+  $("contactReplyLink").href = "mailto:" + encodeURIComponent(item.email) + "?subject=" + encodeURIComponent("Re: " + item.subject);
+  $("contactMessageDetail").hidden = false;
+  $("contactMessageDetail").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  if (!item.is_read) {
+    try {
+      await requestJSON("/api/contact-messages", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: item.id, is_read: true })
+      });
+      await loadContactMessages();
+    } catch (error) {
+      $("contactInboxMessage").textContent = error.message || "የመልዕክቱን ሁኔታ ማዘመን አልተቻለም።";
+    }
+  }
+}
+
+// ==========================================
 // START DASHBOARD
 // ==========================================
 
@@ -1231,6 +1309,7 @@ async function startDashboard() {
 
   await loadDashboard();
   await loadSiteSettings().catch((error) => { $("settingsMessage").textContent = error.message; });
+  await loadContactMessages();
 }
 
 // ==========================================
@@ -1240,11 +1319,16 @@ async function startDashboard() {
 $("jobForm").addEventListener("submit", createJob);
 $("siteSettingsForm").addEventListener("submit", saveSiteSettings);
 $("reloadSettingsButton").addEventListener("click", () => loadSiteSettings().catch((error) => { $("settingsMessage").textContent = error.message; }));
-addTranslationControls();
-
 $("cancelEditButton").addEventListener("click", () => {
   resetJobForm();
 });
+
+$("contactMessagesTable").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-contact-message-id]");
+  if (button) openContactMessage(button.dataset.contactMessageId);
+});
+$("refreshContactMessages").addEventListener("click", loadContactMessages);
+$("closeContactDetail").addEventListener("click", () => { $("contactMessageDetail").hidden = true; });
 
 $("logoutButton").addEventListener("click", logout);
 

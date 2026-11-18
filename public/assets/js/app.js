@@ -93,6 +93,18 @@ function applyPublicContactLanguage() {
   const title = $("#public-contact-title");
   if (eyebrow) eyebrow.textContent = language === "am" ? "ያግኙን" : "CONTACT";
   if (title) title.textContent = language === "am" ? "አግኙን" : "Contact us";
+  const labels = {
+    "contact-name-label": language === "am" ? "ስም" : "Name",
+    "contact-email-label": language === "am" ? "ኢሜይል" : "Email",
+    "contact-subject-label": language === "am" ? "ርዕስ" : "Subject",
+    "contact-message-label": language === "am" ? "መልዕክት" : "Message"
+  };
+  Object.entries(labels).forEach(([id, value]) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  });
+  const submit = document.getElementById("contact-submit");
+  if (submit) submit.textContent = language === "am" ? "መልዕክቱን ላክ" : "Send message";
 
   document.querySelectorAll("[data-contact-type]").forEach((link) => {
     const type = link.dataset.contactType;
@@ -140,8 +152,8 @@ async function loadSiteSettings() {
       const phone = String(siteSettings.contact_phone || "").trim();
       contactDetails.replaceChildren();
 
+      contactSection.hidden = false;
       if (email || phone) {
-        contactSection.hidden = false;
         const eyebrow = $("#public-contact-eyebrow");
         const title = $("#public-contact-title");
         if (eyebrow) eyebrow.textContent = language === "am" ? "ያግኙን" : "CONTACT";
@@ -163,8 +175,6 @@ async function loadSiteSettings() {
           link.textContent = (language === "am" ? "ስልክ፦ " : "Phone: ") + phone;
           contactDetails.appendChild(link);
         }
-      } else {
-        contactSection.hidden = true;
       }
     }
 
@@ -344,7 +354,7 @@ function renderCategories() {
 
 async function loadCategories() {
   try {
-    const response = await fetch("/api/categories", {
+    const response = await fetch("/api/lookups?type=categories", {
       headers: { Accept: "application/json" },
       cache: "no-store"
     });
@@ -405,7 +415,7 @@ function renderLocationSuggestions() {
 
 async function loadLocations() {
   try {
-    const response = await fetch("/api/locations", {
+    const response = await fetch("/api/lookups?type=locations", {
       headers: { Accept: "application/json" },
       cache: "no-store"
     });
@@ -675,6 +685,44 @@ $("#jobs-next")?.addEventListener("click", () => {
   if (currentPage < totalPages) {
     currentPage += 1;
     loadJobs();
+  }
+});
+
+// =========================================
+// PUBLIC CONTACT FORM
+// =========================================
+document.getElementById("contact-form")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const button = document.getElementById("contact-submit");
+  const status = document.getElementById("contact-form-status");
+  if (!form.reportValidity()) return;
+  const payload = Object.fromEntries(new FormData(form).entries());
+  button.disabled = true;
+  status.className = "";
+  status.textContent = language === "am" ? "በመላክ ላይ..." : "Sending...";
+  try {
+    const response = await fetch("/api/contact-messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json();
+    if (!response.ok || result.ok !== true) {
+      throw new Error(result.error || "Unable to send your message.");
+    }
+    form.reset();
+    status.className = "success";
+    status.textContent = language === "am"
+      ? "መልዕክትዎ ተልኳል። እናመሰግናለን!"
+      : "Your message has been sent. Thank you!";
+  } catch (error) {
+    status.className = "error";
+    status.textContent = language === "am"
+      ? "መልዕክቱን መላክ አልተቻለም። እንደገና ይሞክሩ።"
+      : (error.message || "Unable to send your message. Please try again.");
+  } finally {
+    button.disabled = false;
   }
 });
 

@@ -231,11 +231,24 @@
     </section>
   </main>
 
-  <section class="contact-section" id="contact" hidden>
+  <section class="contact-section" id="contact">
     <div class="contact-inner">
       <span class="eyebrow" id="public-contact-eyebrow">CONTACT</span>
       <h2 id="public-contact-title">Contact us</h2>
       <div class="contact-details" id="public-contact-details"></div>
+      <form class="contact-form" id="contact-form">
+        <div class="contact-form-grid">
+          <label><span id="contact-name-label">ስም</span><input id="contact-name" name="name" type="text" maxlength="100" autocomplete="name" required></label>
+          <label><span id="contact-email-label">ኢሜይል</span><input id="contact-email" name="email" type="email" maxlength="254" autocomplete="email" required></label>
+          <label class="contact-form-full"><span id="contact-subject-label">ርዕስ</span><input id="contact-subject" name="subject" type="text" maxlength="160" required></label>
+          <label class="contact-form-full"><span id="contact-message-label">መልዕክት</span><textarea id="contact-message" name="message" rows="5" maxlength="5000" required></textarea></label>
+          <label class="contact-honeypot" aria-hidden="true">Leave this field empty<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
+        </div>
+        <div class="contact-form-actions">
+          <button type="submit" id="contact-submit">መልዕክቱን ላክ</button>
+          <p id="contact-form-status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
     </div>
   </section>
 

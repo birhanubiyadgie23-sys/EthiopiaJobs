@@ -2392,3 +2392,21 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   border-color: #a9d5bd;
   background: #eff9f1;
 }
+
+
+/* Public contact message form */
+.contact-form { max-width: 760px; margin-top: 26px; }
+.contact-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.contact-form-grid label { display: flex; flex-direction: column; gap: 7px; color: #24443f; font-size: 14px; font-weight: 700; }
+.contact-form-grid input, .contact-form-grid textarea { width: 100%; border: 1px solid #d6e5dc; border-radius: 10px; padding: 12px 14px; background: #fff; color: #203b37; font: inherit; }
+.contact-form-grid textarea { resize: vertical; min-height: 130px; }
+.contact-form-grid input:focus, .contact-form-grid textarea:focus { outline: 2px solid #82bda0; border-color: #82bda0; }
+.contact-form-full { grid-column: 1 / -1; }
+.contact-form-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 16px; }
+.contact-form-actions button { min-height: 44px; padding: 10px 20px; border: 0; border-radius: 10px; background: #17665d; color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
+.contact-form-actions button:disabled { opacity: .65; cursor: wait; }
+#contact-form-status { margin: 0; font-size: 14px; line-height: 1.5; }
+#contact-form-status.success { color: #15803d; }
+#contact-form-status.error { color: #b91c1c; }
+.contact-honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+@media (max-width: 650px) { .contact-form-grid { grid-template-columns: 1fr; } .contact-form-full { grid-column: auto; } }

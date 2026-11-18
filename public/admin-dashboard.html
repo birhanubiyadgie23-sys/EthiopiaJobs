@@ -756,11 +756,10 @@ function renderJobs(jobs) {
     date.textContent = formatDate(job.published_at);
 
     const actionCell = document.createElement("td");
-
     const button = document.createElement("button");
+
     button.type = "button";
     button.className = "job-action-button";
-
     button.dataset.jobId = String(job.id);
 
     if (job.status === "published") {

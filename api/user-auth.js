@@ -14,7 +14,7 @@ const SESSION_SECONDS = 60 * 60 * 24 * 30;
 function validEmail(value) {
   return typeof value === "string" &&
     value.length <= 254 &&
-    /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value.trim());
+    /^[^\s@]+@[^\s@]+\\.[^\s@]+$/.test(value.trim());
 }
 
 async function ensureUsersTable() {
@@ -63,7 +63,7 @@ async function readSession(req, secret) {
     if (decoded.toString("base64url") !== payload) return null;
     const session = JSON.parse(decoded.toString("utf8"));
     if (!session || typeof session.sub !== "string" ||
-        !/^[1-9]\\d{0,18}$/.test(session.sub) ||
+        !/^[1-9]\d{0,18}$/.test(session.sub) ||
         typeof session.email !== "string" ||
         !Number.isSafeInteger(session.exp) ||
         session.exp <= Math.floor(Date.now() / 1000)) return null;

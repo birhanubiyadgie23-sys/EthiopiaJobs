@@ -1203,7 +1203,7 @@ async function translateField(sourceId,targetId,button) {
   const source = sourceId.endsWith("_am") ? "am" : "en";
   button.disabled = true; button.textContent = "በመተርጎም...";
   try {
-    const result = await requestJSON("/api/admin/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,source,target:source==="am"?"en":"am"})});
+    const result = await requestJSON("/api/site-settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"translate",text,source,target:source==="am"?"en":"am"})});
     $(targetId).value = result.translatedText || "";
     $("formMessage").textContent = "ትርጉሙን ያረጋግጡና ከዚያ ያስቀምጡ።"; $("formMessage").className="success";
   } catch(error) { $("formMessage").textContent=error.message; $("formMessage").className="error"; }

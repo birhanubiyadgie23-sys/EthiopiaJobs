@@ -854,8 +854,8 @@ async function loadDashboard() {
     ] = await Promise.all([
       requestJSON("/api/admin/jobs?page=1&limit=100"),
       requestJSON("/api/admin/jobs?page=1&limit=1&status=published"),
-      requestJSON("/api/categories"),
-      requestJSON("/api/locations"),
+      requestJSON("/api/lookups?type=categories"),
+      requestJSON("/api/lookups?type=locations"),
       requestJSON("/api/newspapers")
     ]);
 

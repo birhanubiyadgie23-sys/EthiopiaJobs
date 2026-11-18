@@ -357,6 +357,11 @@
       ከማተም በፊት መረጃውን አረጋግጥ።
     </p>
 
+    <p class="help">
+      ማስታወቂያውን በአማርኛና በEnglish በተለያዩ መስኮች እራስዎ ያስገቡ።
+      አውቶማቲክ ትርጉም አይጠቀምም፤ የሌለውን ቋንቋ መስክ ባዶ መተው ይችላሉ።
+    </p>
+
     <form id="jobForm">
       <div class="form-grid">
 
@@ -1217,30 +1222,8 @@ async function saveSiteSettings(event) {
   } catch(error) { message.textContent = error.message; message.className = "error"; }
   finally { button.disabled = false; }
 }
-const translationPairs = [["title_am","title_en"],["description_am","description_en"],["requirements_am","requirements_en"],["application_method_am","application_method_en"]];
-async function translateField(sourceId,targetId,button) {
-  const text = $(sourceId).value.trim();
-  if (!text) { $("formMessage").textContent = "መጀመሪያ ጽሑፍ ያስገቡ።"; return; }
-  const source = sourceId.endsWith("_am") ? "am" : "en";
-  button.disabled = true; button.textContent = "በመተርጎም...";
-  try {
-    const result = await requestJSON("/api/site-settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"translate",text,source,target:source==="am"?"en":"am"})});
-    $(targetId).value = result.translatedText || "";
-    $("formMessage").textContent = "ትርጉሙን ያረጋግጡና ከዚያ ያስቀምጡ።"; $("formMessage").className="success";
-  } catch(error) { $("formMessage").textContent=error.message; $("formMessage").className="error"; }
-  finally { button.disabled=false; button.textContent=source==="am"?"ወደ English ተርጉም →":"→ ወደ አማርኛ ተርጉም"; }
-}
-function addTranslationControls() {
-  translationPairs.forEach(([am,en]) => [[am,en],[en,am]].forEach(([source,target]) => {
-    const field=$(source), button=document.createElement("button");
-    button.type="button"; button.className="secondary-button"; button.style.marginTop="6px";
-    button.textContent=source.endsWith("_am")?"ወደ English ተርጉም →":"→ ወደ አማርኛ ተርጉም";
-    button.addEventListener("click",()=>translateField(source,target,button));
-    field.insertAdjacentElement("afterend",button);
-  }));
-}
+// Job content is entered in both languages manually. No paid translation API is required.
 
-// ==========================================
 // CONTACT MESSAGE INBOX
 // ==========================================
 let contactMessages = [];
@@ -1336,8 +1319,6 @@ async function startDashboard() {
 $("jobForm").addEventListener("submit", createJob);
 $("siteSettingsForm").addEventListener("submit", saveSiteSettings);
 $("reloadSettingsButton").addEventListener("click", () => loadSiteSettings().catch((error) => { $("settingsMessage").textContent = error.message; }));
-addTranslationControls();
-
 $("cancelEditButton").addEventListener("click", () => {
   resetJobForm();
 });
